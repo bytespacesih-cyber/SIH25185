@@ -1,0 +1,102 @@
+import { createContext, useContext, useState, useEffect } from "react";
+
+// Create Context
+const AuthContext = createContext();
+
+// User roles
+export const ROLES = {
+  USER: 'user',
+  REVIEWER: 'reviewer', 
+  STAFF: 'staff'
+};
+
+// Provider Component
+export const AuthProvider = ({ children }) => {
+  const [user, setUser] = useState(null);   // store user object with role
+  const [loading, setLoading] = useState(true); // check session load
+
+  // Auto-login if token exists
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      fetch("http://localhost:5000/api/auth/me", {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.user) setUser(data.user);
+        })
+        .catch(() => setUser(null))
+        .finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
+  // Login function
+  const login = async (email, password) => {
+    const res = await fetch("http://localhost:5000/api/auth/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem("token", data.token);
+      setUser(data.user);
+    } else {
+      throw new Error(data.message || "Login failed");
+    }
+  };
+
+  // Register function
+  const register = async (name, email, password, role = ROLES.USER, department = "") => {
+    const res = await fetch("http://localhost:5000/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, email, password, role, department }),
+    });
+
+    const data = await res.json();
+    if (res.ok) {
+      localStorage.setItem("token", data.token);
+      setUser(data.user);
+    } else {
+      throw new Error(data.message || "Registration failed");
+    }
+  };
+
+  // Logout function
+  const logout = () => {
+    localStorage.removeItem("token");
+    setUser(null);
+  };
+
+  // Role check helper functions
+  const isUser = () => user?.role === ROLES.USER;
+  const isReviewer = () => user?.role === ROLES.REVIEWER;
+  const isStaff = () => user?.role === ROLES.STAFF;
+  const hasRole = (role) => user?.role === role;
+
+  return (
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      login, 
+      register, 
+      logout,
+      isUser,
+      isReviewer,
+      isStaff,
+      hasRole,
+      ROLES
+    }}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+
+// Custom Hook
+export const useAuth = () => useContext(AuthContext);
+

@@ -1,0 +1,117 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #1f2937;
+  --text-primary: #111827;
+  --text-secondary: #374151;
+  --text-muted: #6b7280;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #111827;
+    --foreground: #f9fafb;
+    --text-primary: #ffffff;
+    --text-secondary: #e5e7eb;
+    --text-muted: #d1d5db;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+/* Enhanced text visibility classes */
+.text-primary {
+  color: var(--text-primary) !important;
+  font-weight: 500;
+}
+
+.text-secondary {
+  color: var(--text-secondary) !important;
+  font-weight: 400;
+}
+
+.text-muted {
+  color: var(--text-muted) !important;
+}
+
+/* Override default gray text colors for better contrast */
+.text-gray-600 {
+  color: var(--text-secondary) !important;
+}
+
+.text-gray-700 {
+  color: var(--text-primary) !important;
+}
+
+.text-gray-800 {
+  color: var(--text-primary) !important;
+  font-weight: 600;
+}
+
+/* Enhanced button visibility */
+button {
+  font-weight: 500;
+  transition: all 0.2s ease-in-out;
+}
+
+button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+}
+
+/* Enhanced form inputs */
+input, textarea, select {
+  border: 2px solid #d1d5db;
+  color: #000000 !important;
+  background-color: #ffffff !important;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: #3b82f6;
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  color: #000000 !important;
+}
+
+input::placeholder, textarea::placeholder {
+  color: #6b7280 !important;
+  font-weight: 400;
+}
+
+/* Specific input styling overrides */
+input[type="text"], 
+input[type="email"], 
+input[type="password"], 
+input[type="number"], 
+textarea {
+  color: #000000 !important;
+  background-color: #ffffff !important;
+}
+
+/* Enhanced card styling */
+.card {
+  background: white;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+  transition: box-shadow 0.2s ease-in-out;
+}
+
+.card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
