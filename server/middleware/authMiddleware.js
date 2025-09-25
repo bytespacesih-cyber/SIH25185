@@ -11,6 +11,7 @@ export const protect = async (req, res, next) => {
       token = req.headers.authorization.split(' ')[1];
     }
 
+
     if (!token) {
       return res.status(401).json({ 
         success: false, 
@@ -24,6 +25,7 @@ export const protect = async (req, res, next) => {
       
       // Get user from token
       const user = await User.findById(decoded.id).select('-password');
+
       
       if (!user) {
         return res.status(401).json({ 
@@ -58,6 +60,7 @@ export const protect = async (req, res, next) => {
 // Role-based access control
 export const authorize = (...roles) => {
   return (req, res, next) => {
+    console.log("User Info:", req.user);
     if (!req.user) {
       return res.status(401).json({ 
         success: false, 

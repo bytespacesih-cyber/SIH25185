@@ -1,10 +1,12 @@
 import Proposal from "../models/Proposal.js";
 import User from "../models/User.js";
+import emailService from "../services/emailService.js";
 
 // Create a new proposal
 export const createProposal = async (req, res) => {
   try {
     const { title, description, domain, budget, tags } = req.body;
+    console.log(title, description, domain, budget, tags)
 
     // Validation
     if (!title || !description || !domain || !budget) {
@@ -28,6 +30,22 @@ export const createProposal = async (req, res) => {
     });
 
     const populatedProposal = await Proposal.findById(proposal._id).populate('author', 'name email');
+
+    // Send proposal submission confirmation email
+    try {
+      await emailService.sendProposalStatusEmail(
+        populatedProposal.author.email,
+        populatedProposal.author.name,
+        populatedProposal.title,
+        'draft',
+        'submitted',
+        'System',
+        'Your proposal has been successfully submitted and is now under review.'
+      );
+      console.log(`✅ Proposal submission email sent to ${populatedProposal.author.email}`);
+    } catch (emailError) {
+      console.error('❌ Failed to send proposal submission email:', emailError.message);
+    }
 
     res.status(201).json({
       success: true,
@@ -57,6 +75,7 @@ export const createProposal = async (req, res) => {
 export const getProposals = async (req, res) => {
   try {
     let proposals;
+    console.log("getProposals called for user:", req.user._id, "with role:", req.user.role);
 
     switch (req.user.role) {
       case 'user':
@@ -102,9 +121,12 @@ export const getProposals = async (req, res) => {
 // Get user's own proposals
 export const getMyProposals = async (req, res) => {
   try {
+    console.log('Fetching proposals for user:', req.user._id);
     const proposals = await Proposal.find({ author: req.user._id })
       .populate('reviewer assignedStaff.user', 'name email')
       .sort({ createdAt: -1 });
+
+    console.log(proposals);
 
     res.json({
       success: true,
@@ -149,6 +171,7 @@ export const getAssignedProposals = async (req, res) => {
 // Get single proposal by ID
 export const getProposalById = async (req, res) => {
   try {
+    console.log("getProposalById called for user:", req.user._id, "with role:", req.user.role);
     const proposal = await Proposal.findById(req.params.id)
       .populate('author reviewer assignedStaff.user feedback.from', 'name email');
 
@@ -282,7 +305,21 @@ export const addFeedback = async (req, res) => {
     await proposal.addFeedback(req.user._id, feedback, type);
 
     const updatedProposal = await Proposal.findById(req.params.id)
-      .populate('feedback.from', 'name email role');
+      .populate('feedback.from author', 'name email role');
+
+    // Send feedback notification email to proposal author
+    try {
+      await emailService.sendFeedbackEmail(
+        updatedProposal.author.email,
+        updatedProposal.author.name,
+        updatedProposal.title,
+        req.user.name,
+        feedback
+      );
+      console.log(`✅ Feedback notification email sent to ${updatedProposal.author.email}`);
+    } catch (emailError) {
+      console.error('❌ Failed to send feedback notification email:', emailError.message);
+    }
 
     res.json({
       success: true,
@@ -334,7 +371,37 @@ export const assignStaff = async (req, res) => {
     await proposal.save();
 
     const updatedProposal = await Proposal.findById(req.params.id)
-      .populate('assignedStaff.user reviewer', 'name email');
+      .populate('assignedStaff.user reviewer author', 'name email');
+
+    // Send assignment email to staff member
+    try {
+      await emailService.sendStaffAssignmentEmail(
+        staffMember.email,
+        staffMember.name,
+        updatedProposal.title,
+        updatedProposal.author.name,
+        req.user.name
+      );
+      console.log(`✅ Staff assignment email sent to ${staffMember.email}`);
+    } catch (emailError) {
+      console.error('❌ Failed to send staff assignment email:', emailError.message);
+    }
+
+    // Send status update email to proposal author
+    try {
+      await emailService.sendProposalStatusEmail(
+        updatedProposal.author.email,
+        updatedProposal.author.name,
+        updatedProposal.title,
+        updatedProposal.status,
+        'assigned_to_staff',
+        req.user.name,
+        `Your proposal has been assigned to ${staffMember.name} for further development.`
+      );
+      console.log(`✅ Assignment notification email sent to ${updatedProposal.author.email}`);
+    } catch (emailError) {
+      console.error('❌ Failed to send assignment notification email:', emailError.message);
+    }
 
     res.json({
       success: true,
@@ -393,6 +460,22 @@ export const updateProposalStatus = async (req, res) => {
 
     const updatedProposal = await Proposal.findById(req.params.id)
       .populate('author reviewer assignedStaff.user', 'name email');
+
+    // Send status update email to proposal author
+    try {
+      await emailService.sendProposalStatusEmail(
+        updatedProposal.author.email,
+        updatedProposal.author.name,
+        updatedProposal.title,
+        proposal.status, // old status
+        status, // new status
+        req.user.name,
+        comment
+      );
+      console.log(`✅ Status update email sent to ${updatedProposal.author.email}`);
+    } catch (emailError) {
+      console.error('❌ Failed to send status update email:', emailError.message);
+    }
 
     res.json({
       success: true,

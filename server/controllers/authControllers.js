@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import { generateToken } from "../utils/generateToken.js";
+import emailService from "../services/emailService.js";
 
 // Register user
 export const registerUser = async (req, res) => {
@@ -13,7 +14,7 @@ export const registerUser = async (req, res) => {
         message: 'Please provide name, email, and password'
       });
     }
-
+   
     // Check if user already exists
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -44,6 +45,15 @@ export const registerUser = async (req, res) => {
 
     // Generate JWT token
     const token = generateToken(user._id);
+
+    // Send welcome email (don't block registration if email fails)
+    try {
+      await emailService.sendWelcomeEmail(user.email, user.name, user.role);
+      console.log(`✅ Welcome email sent to ${user.email}`);
+    } catch (emailError) {
+      console.error('❌ Failed to send welcome email:', emailError.message);
+      // Continue with registration success even if email fails
+    }
 
     res.status(201).json({
       success: true,

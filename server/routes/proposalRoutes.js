@@ -20,11 +20,11 @@ router.use(protect);
 
 // General routes
 router.post("/", authorize('user'), createProposal);
-router.get("/", getProposals);
-router.get("/:id", getProposalById);
+router.get("/", getMyProposals); // i changed this line to getMyProposals
+router.get("/:id", getMyProposals); // i changed this line to getMyProposals
 
 // User-specific routes
-router.get("/my-proposals", authorize('user'), getMyProposals);
+router.get("/my-proposals", protect, authorize('user'), getMyProposals);
 router.put("/:id", authorize('user'), updateProposal);
 
 // Staff-specific routes  

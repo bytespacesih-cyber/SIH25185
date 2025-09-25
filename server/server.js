@@ -18,10 +18,7 @@ connectDB();
 const app = express();
 
 // Middleware
-app.use(cors({
-  origin: process.env.CLIENT_URL || "http://localhost:3001",
-  credentials: true
-}));
+app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -32,6 +29,45 @@ app.get('/api/health', (req, res) => {
     message: 'NaCCER Portal API is running',
     timestamp: new Date().toISOString()
   });
+});
+
+// Email test route (for development)
+app.get('/api/test-email', async (req, res) => {
+  try {
+    const emailService = (await import('./services/emailService.js')).default;
+    
+    // Test email connection
+    const connectionTest = await emailService.testConnection();
+    if (!connectionTest.success) {
+      return res.status(500).json({
+        success: false,
+        message: 'Email service connection failed',
+        error: connectionTest.error
+      });
+    }
+
+    // Send test email
+    const testResult = await emailService.sendWelcomeEmail(
+      process.env.EMAIL_USER,
+      'Test User',
+      'user'
+    );
+
+    res.json({
+      success: true,
+      message: 'Email test completed',
+      connectionTest,
+      emailTest: testResult
+    });
+
+  } catch (error) {
+    console.error('Email test error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Email test failed',
+      error: error.message
+    });
+  }
 });
 
 // API Routes

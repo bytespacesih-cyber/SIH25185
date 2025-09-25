@@ -36,9 +36,11 @@ function DashboardContent() {
           }
         });
 
+
         if (response.ok) {
           const data = await response.json();
-          setProposals(Array.isArray(data) ? data : []);
+          console.log(data);
+          setProposals(Array.isArray(data.proposals) ? data.proposals : []);
         } else {
           console.log("API failed, using fallback data");
           // Enhanced fallback mock data based on role

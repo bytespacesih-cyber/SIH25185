@@ -45,43 +45,43 @@ export default function Login() {
           )}
 
           <div className="mb-6">
-            <label className="block text-gray-800 text-sm font-semibold mb-2">Email Address</label>
+            <label className="block text-black text-base font-bold mb-3" style={{ color: '#000000' }}>Email Address</label>
             <input
               type="email"
               name="email"
-              placeholder="Enter your email"
+              placeholder="Enter your email address"
               value={form.email}
               onChange={handleChange}
-              className="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-black bg-white font-medium"
-              style={{ color: '#000000', backgroundColor: '#ffffff' }}
+              className="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-gray-900 bg-white font-medium transition-colors"
+              style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
               required
             />
           </div>
           <div className="mb-8">
-            <label className="block text-gray-800 text-sm font-semibold mb-2">Password</label>
+            <label className="block text-black text-base font-bold mb-3" style={{ color: '#000000' }}>Password</label>
             <input
               type="password"
               name="password"
               placeholder="Enter your password"
               value={form.password}
               onChange={handleChange}
-              className="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-black bg-white font-medium"
-              style={{ color: '#000000', backgroundColor: '#ffffff' }}
+              className="w-full p-4 border-2 border-gray-300 rounded-lg focus:border-blue-500 focus:outline-none text-gray-900 bg-white font-medium transition-colors"
+              style={{ color: '#1f2937', backgroundColor: '#ffffff' }}
               required
             />
           </div>
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-bold text-lg shadow-lg"
+            className="w-full bg-blue-600 text-white py-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 font-bold text-lg shadow-lg transition-colors"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
           
           <div className="mt-6 text-center">
-            <p className="text-gray-700 font-medium">
+            <p className="text-gray-800 font-medium">
               Don't have an account? 
-              <a href="/register" className="text-blue-600 hover:text-blue-800 font-bold ml-1">Register here</a>
+              <a href="/register" className="text-blue-600 hover:text-blue-800 font-bold ml-1 underline">Register here</a>
             </p>
           </div>
           
