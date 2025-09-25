@@ -1,10 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useAuth, ROLES } from "../context/AuthContext";
 
 export default function Navbar() {
-  const { user, logout, isUser, isReviewer, isStaff } = useAuth();
+  const { user, logout, isUser, isReviewer, isStaff, loading } = useAuth();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const userMenuRef = useRef(null);
+
+  // Debug: Log user state
+  console.log("Navbar - User:", user, "Loading:", loading);
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setIsUserMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   const getRoleColor = (role) => {
     switch (role?.toLowerCase()) {
@@ -41,7 +60,14 @@ export default function Navbar() {
         
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
-            {user ? (
+            {loading ? (
+              // Loading state - show skeleton to prevent hydration mismatch
+              <div className="flex items-center gap-4">
+                <div className="w-20 h-8 bg-slate-700 rounded animate-pulse"></div>
+                <div className="w-16 h-8 bg-slate-700 rounded animate-pulse"></div>
+                <div className="w-24 h-8 bg-slate-700 rounded animate-pulse"></div>
+              </div>
+            ) : user ? (
               // Logged-in user navigation
               <>
                 <div className="flex items-center gap-6">
@@ -54,6 +80,16 @@ export default function Navbar() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2a2 2 0 01-2 2H10a2 2 0 01-2-2V5z" />
                     </svg>
                     Dashboard
+                  </Link>
+                  
+                  <Link 
+                    href="/profile" 
+                    className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-white/10 transition-all duration-300 font-medium"
+                  >
+                    <svg className="w-4 h-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    Profile
                   </Link>
                   
                   {/* User-specific navigation */}
@@ -96,28 +132,126 @@ export default function Navbar() {
                   )}
                 </div>
                 
-                {/* User Profile Section */}
-                <div className="flex items-center gap-4 pl-4 border-l border-slate-700">
-                  <div className="flex items-center gap-3">
-                    <div className="text-right">
-                      <div className="text-sm font-semibold text-white">{user.name}</div>
-                      <div className={`text-sm px-4 py-2 rounded-lg bg-gradient-to-r ${getRoleColor(user.role)} text-white font-semibold`}>
+                {/* User Profile Dropdown */}
+                <div className="relative pl-4 border-l border-slate-700" ref={userMenuRef}>
+                  <button
+                    onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                    className="flex items-center gap-3 hover:bg-white/10 px-3 py-2 rounded-lg transition-all duration-300 group"
+                  >
+                    {/* User Avatar - Always Visible */}
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center border-2 border-white/30 group-hover:border-blue-300 transition-all duration-300 shadow-lg shrink-0">
+                      {user.profilePicture ? (
+                        <img 
+                          src={user.profilePicture} 
+                          alt={user.name} 
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-white font-bold text-sm uppercase">
+                          {user.name?.charAt(0) || 'U'}
+                        </span>
+                      )}
+                    </div>
+                    
+                    {/* User Info - Hidden on small screens */}
+                    <div className="text-left hidden md:block">
+                      <div className="text-sm font-semibold text-white group-hover:text-blue-300 transition-colors">
+                        {user.name}
+                      </div>
+                      <div className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRoleColor(user.role)} text-white font-medium`}>
                         {user.role?.toUpperCase()}
                       </div>
                     </div>
-                    <div className="w-10 h-10 bg-gradient-to-br from-slate-600 to-slate-700 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">{user.name?.charAt(0)}</span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={logout}
-                    className="group bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    
+                    {/* Dropdown Arrow */}
+                    <svg 
+                      className={`w-4 h-4 text-white transition-transform duration-300 ${isUserMenuOpen ? 'rotate-180' : ''}`} 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
-                    Logout
                   </button>
+
+                  {/* User Dropdown Menu */}
+                  {isUserMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-slate-200 py-2 z-50 animate-in slide-in-from-top-2 duration-200">
+                      {/* User Info Header */}
+                      <div className="px-4 py-3 border-b border-slate-100">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center border-2 border-blue-200 shadow-lg">
+                            {user.profilePicture ? (
+                              <img 
+                                src={user.profilePicture} 
+                                alt={user.name} 
+                                className="w-full h-full rounded-full object-cover"
+                              />
+                            ) : (
+                              <span className="text-white font-bold uppercase">{user.name?.charAt(0) || 'U'}</span>
+                            )}
+                          </div>
+                          <div>
+                            <div className="font-semibold text-slate-800">{user.name}</div>
+                            <div className="text-sm text-slate-600">{user.email}</div>
+                            <div className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRoleColor(user.role)} text-white font-medium inline-block mt-1`}>
+                              {user.role?.toUpperCase()}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Menu Items */}
+                      <div className="py-2">
+                        <Link 
+                          href="/profile" 
+                          className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors duration-200 text-slate-700 hover:text-blue-600"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                          </svg>
+                          <div>
+                            <div className="font-medium">View Profile</div>
+                            <div className="text-xs text-slate-500">Manage your account</div>
+                          </div>
+                        </Link>
+
+                        <Link 
+                          href="/dashboard" 
+                          className="flex items-center gap-3 px-4 py-3 hover:bg-slate-50 transition-colors duration-200 text-slate-700 hover:text-blue-600"
+                          onClick={() => setIsUserMenuOpen(false)}
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2H5a2 2 0 00-2-2z" />
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5a2 2 0 012-2h4a2 2 0 012 2v2a2 2 0 01-2 2H10a2 2 0 01-2-2V5z" />
+                          </svg>
+                          <div>
+                            <div className="font-medium">Dashboard</div>
+                            <div className="text-xs text-slate-500">Go to main dashboard</div>
+                          </div>
+                        </Link>
+
+                        <hr className="my-2 border-slate-100" />
+
+                        <button
+                          onClick={() => {
+                            logout();
+                            setIsUserMenuOpen(false);
+                          }}
+                          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors duration-200 text-red-600 hover:text-red-700"
+                        >
+                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                          </svg>
+                          <div>
+                            <div className="font-medium">Sign Out</div>
+                            <div className="text-xs text-red-500">Logout from your account</div>
+                          </div>
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </>
             ) : (
@@ -151,8 +285,23 @@ export default function Navbar() {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          {/* Mobile Actions */}
+          <div className="md:hidden flex items-center gap-3">
+            {user && (
+              <Link href="/profile" className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center border border-white/30 shadow-lg hover:scale-110 transition-transform duration-300">
+                {user.profilePicture ? (
+                  <img 
+                    src={user.profilePicture} 
+                    alt={user.name} 
+                    className="w-full h-full rounded-full object-cover"
+                  />
+                ) : (
+                  <span className="text-white font-bold text-xs uppercase">
+                    {user.name?.charAt(0) || 'U'}
+                  </span>
+                )}
+              </Link>
+            )}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="w-10 h-10 bg-white/10 hover:bg-white/20 rounded-lg flex items-center justify-center transition-all duration-300"
@@ -169,10 +318,20 @@ export default function Navbar() {
       {isMenuOpen && (
         <div className="md:hidden absolute top-16 inset-x-0 bg-slate-900 border-t border-slate-700 shadow-2xl z-50">
           <div className="px-4 py-6 space-y-4">
-            {user ? (
+            {loading ? (
+              // Loading state for mobile menu
+              <div className="space-y-3">
+                <div className="w-full h-10 bg-slate-700 rounded animate-pulse"></div>
+                <div className="w-full h-10 bg-slate-700 rounded animate-pulse"></div>
+                <div className="w-full h-10 bg-slate-700 rounded animate-pulse"></div>
+              </div>
+            ) : user ? (
               <>
                 <Link href="/dashboard" className="block px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-300">
                   Dashboard
+                </Link>
+                <Link href="/profile" className="block px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-300">
+                  Profile
                 </Link>
                 {isUser() && (
                   <Link href="/proposal/create" className="block px-4 py-3 rounded-lg bg-white/5 hover:bg-white/10 transition-all duration-300">
@@ -190,12 +349,33 @@ export default function Navbar() {
                   </Link>
                 )}
                 <div className="pt-4 border-t border-slate-700">
-                  <div className="px-4 py-2 text-sm font-semibold">{user.name}</div>
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center border-2 border-white/30 shadow-lg">
+                      {user.profilePicture ? (
+                        <img 
+                          src={user.profilePicture} 
+                          alt={user.name} 
+                          className="w-full h-full rounded-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-white font-bold text-sm uppercase">{user.name?.charAt(0) || 'U'}</span>
+                      )}
+                    </div>
+                    <div>
+                      <div className="text-white font-semibold">{user.name}</div>
+                      <div className={`text-xs px-2 py-1 rounded-full bg-gradient-to-r ${getRoleColor(user.role)} text-white font-medium`}>
+                        {user.role?.toUpperCase()}
+                      </div>
+                    </div>
+                  </div>
                   <button
                     onClick={logout}
-                    className="w-full text-left px-4 py-3 bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-300"
+                    className="w-full text-left px-4 py-3 bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-300 flex items-center gap-2"
                   >
-                    Logout
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    </svg>
+                    Sign Out
                   </button>
                 </div>
               </>

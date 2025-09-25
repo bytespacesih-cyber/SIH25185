@@ -167,18 +167,46 @@ export const getProfile = async (req, res) => {
 // Update user profile
 export const updateProfile = async (req, res) => {
   try {
-    const { name, department, expertise } = req.body;
+    const { name, email, department, expertise, profilePicture } = req.body;
     
     const updateData = {};
     if (name) updateData.name = name;
+    if (email) updateData.email = email;
     if (department) updateData.department = department;
-    if (expertise) updateData.expertise = expertise.split(',').map(e => e.trim());
+    if (profilePicture) updateData.profilePicture = profilePicture;
+    
+    // Handle expertise array
+    if (expertise) {
+      if (Array.isArray(expertise)) {
+        updateData.expertise = expertise.filter(e => e.trim());
+      } else if (typeof expertise === 'string') {
+        updateData.expertise = expertise.split(',').map(e => e.trim()).filter(e => e);
+      }
+    }
+
+    // Check if email is being changed and if it already exists
+    if (email && email !== req.user.email) {
+      const existingUser = await User.findOne({ email, _id: { $ne: req.user._id } });
+      if (existingUser) {
+        return res.status(400).json({
+          success: false,
+          message: 'Email already in use by another account'
+        });
+      }
+    }
 
     const user = await User.findByIdAndUpdate(
       req.user._id,
       updateData,
       { new: true, runValidators: true }
     );
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found'
+      });
+    }
 
     res.json({
       success: true,
@@ -194,6 +222,13 @@ export const updateProfile = async (req, res) => {
       return res.status(400).json({
         success: false,
         message
+      });
+    }
+
+    if (error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email already exists'
       });
     }
 

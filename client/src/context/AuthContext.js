@@ -1,5 +1,8 @@
 import { createContext, useContext, useState, useEffect } from "react";
 
+// Hook to prevent hydration mismatches
+const useIsomorphicLayoutEffect = typeof window !== 'undefined' ? useEffect : () => {};
+
 // Create Context
 const AuthContext = createContext();
 
@@ -14,9 +17,20 @@ export const ROLES = {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);   // store user object with role
   const [loading, setLoading] = useState(true); // check session load
+  const [mounted, setMounted] = useState(false); // track if component is mounted on client
+
+  // Mark component as mounted on client
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Auto-login if token exists
   useEffect(() => {
+    // Only run on client side after mounting
+    if (!mounted) {
+      return;
+    }
+
     const token = localStorage.getItem("token");
     if (token) {
       fetch("http://localhost:5000/api/auth/me", {
@@ -31,7 +45,7 @@ export const AuthProvider = ({ children }) => {
     } else {
       setLoading(false);
     }
-  }, []);
+  }, [mounted]);
 
   // Login function
   const login = async (email, password) => {
@@ -43,7 +57,9 @@ export const AuthProvider = ({ children }) => {
 
     const data = await res.json();
     if (res.ok) {
-      localStorage.setItem("token", data.token);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("token", data.token);
+      }
       setUser(data.user);
     } else {
       throw new Error(data.message || "Login failed");
@@ -60,7 +76,9 @@ export const AuthProvider = ({ children }) => {
 
     const data = await res.json();
     if (res.ok) {
-      localStorage.setItem("token", data.token);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem("token", data.token);
+      }
       setUser(data.user);
     } else {
       throw new Error(data.message || "Registration failed");
@@ -69,7 +87,9 @@ export const AuthProvider = ({ children }) => {
 
   // Logout function
   const logout = () => {
-    localStorage.removeItem("token");
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem("token");
+    }
     setUser(null);
   };
 
@@ -82,7 +102,7 @@ export const AuthProvider = ({ children }) => {
   return (
     <AuthContext.Provider value={{ 
       user, 
-      loading, 
+      loading: loading || !mounted, // Keep loading true until mounted and auth check complete
       login, 
       register, 
       logout,

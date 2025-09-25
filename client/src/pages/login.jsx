@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useRouter } from "next/router";
 import { useAuth } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
+import LoadingScreen from "../components/LoadingScreen";
 
 export default function Login() {
   const router = useRouter();
@@ -19,14 +20,23 @@ export default function Login() {
     setError("");
 
     try {
-      await login(form.email, form.password);
+      // Add minimum loading time for better UX
+      const loginPromise = login(form.email, form.password);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 2000));
+      
+      await Promise.all([loginPromise, minLoadingTime]);
       router.push("/dashboard");
     } catch (err) {
+      // Even on error, maintain minimum loading time
+      await new Promise(resolve => setTimeout(resolve, 1500));
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">

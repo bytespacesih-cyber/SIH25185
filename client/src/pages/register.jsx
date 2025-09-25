@@ -2,6 +2,7 @@
 import { useRouter } from "next/router";
 import { useAuth, ROLES } from "../context/AuthContext";
 import Navbar from "../components/Navbar";
+import LoadingScreen from "../components/LoadingScreen";
 
 export default function Register() {
   const router = useRouter();
@@ -24,14 +25,23 @@ export default function Register() {
     setError("");
 
     try {
-      await register(form.name, form.email, form.password, form.role, form.department);
+      // Add minimum loading time for better UX
+      const registerPromise = register(form.name, form.email, form.password, form.role, form.department);
+      const minLoadingTime = new Promise(resolve => setTimeout(resolve, 2500));
+      
+      await Promise.all([registerPromise, minLoadingTime]);
       router.push("/dashboard");
     } catch (err) {
+      // Even on error, maintain minimum loading time
+      await new Promise(resolve => setTimeout(resolve, 1500));
       setError(err.message);
-    } finally {
       setLoading(false);
     }
   };
+
+  if (loading) {
+    return <LoadingScreen />;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50">
