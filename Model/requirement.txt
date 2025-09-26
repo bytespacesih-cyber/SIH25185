@@ -16,3 +16,7 @@ chardet
 PyPDF2
 python-docx
 google-generativeai
+pymongo
+fastapi
+uvicorn
+python-multipart
