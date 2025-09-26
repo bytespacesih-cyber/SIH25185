@@ -1,3 +1,53 @@
 node_modules/
 */node_modules/
 .env
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.pyc
+
+# Virtual environment
+venv/
+.env/
+*/.env
+.env.*
+.env
+Model/.env
+# IDE / Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs & outputs
+*.log
+outputs/
+*.json
+*.csv
+
+# FAISS indexes
+faiss_index/
+*.faiss
+*.npy
+
+# System files
+.DS_Store
+Thumbs.db
+
+# Executables / installers
+*.exe
+*.dll
+*.bin
+*.msi
+
+# Jupyter notebooks checkpoints
+.ipynb_checkpoints/
