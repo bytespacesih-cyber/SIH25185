@@ -3,58 +3,155 @@ import { useRouter } from 'next/router';
 import { useAuth } from '../../../context/AuthContext';
 import ProtectedRoute from '../../../components/ProtectedRoute';
 
-export default function ViewProposal() {
+function ViewProposalContent() {
   const router = useRouter();
   const { id } = router.query;
   const { user } = useAuth();
   const [proposal, setProposal] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [isExporting, setIsExporting] = useState(false);
+  const [exportType, setExportType] = useState('');
 
   useEffect(() => {
     const fetchProposal = async () => {
       try {
         if (id) {
-          // Mock data - replace with actual API
+          // Mock data for coal R&D proposal
           const mockProposal = {
             id: id,
-            title: "AI-Powered Medical Diagnosis System",
-            researcher: "Dr. Sarah Johnson",
+            title: "Advanced Coal Gasification Technology for Enhanced Energy Production",
+            researcher: "Dr. Raj Patel",
             institution: "Indian Institute of Technology, Delhi",
-            description: "Development of AI system for medical diagnosis using machine learning and computer vision. The system will analyze medical images, patient data, and symptoms to provide accurate diagnostic suggestions to healthcare professionals. This comprehensive solution aims to improve diagnostic accuracy and reduce time-to-diagnosis in critical medical situations.",
-            domain: "Artificial Intelligence & Healthcare",
-            budget: 150000,
+            description: "Development of an innovative coal gasification system achieving 60%+ energy efficiency with integrated carbon capture mechanisms for sustainable coal utilization in power generation and industrial applications.",
+            domain: "Coal Technology & Energy Systems",
+            budget: 20000000,
             status: "under_review",
             submittedDate: "2025-09-20",
             createdAt: "2025-09-20T10:00:00Z",
             duration: "24 months",
-            keywords: ["Artificial Intelligence", "Healthcare", "Machine Learning", "Medical Diagnosis", "Computer Vision"],
-            objectives: [
-              "Develop a machine learning model for medical image analysis with 95% accuracy",
-              "Create an intuitive user interface for healthcare professionals",
-              "Validate the system through comprehensive clinical trials across 5 hospitals",
-              "Ensure HIPAA compliance and robust data security measures",
-              "Implement real-time diagnostic capabilities with sub-minute response times"
-            ],
-            methodology: "We will employ a combination of convolutional neural networks (CNNs) and transformer architectures to analyze medical imaging data. The system will be trained on anonymized patient data from multiple healthcare institutions, utilizing transfer learning and ensemble methods to achieve optimal performance.",
-            expectedOutcomes: "The expected outcome is a 25% improvement in diagnostic accuracy compared to traditional methods, with reduced diagnosis time from hours to minutes. This will lead to better patient outcomes, reduced healthcare costs, and improved workflow efficiency for medical professionals.",
-            timeline: [
-              { phase: "Data Collection & Preprocessing", duration: "3 months", status: "planned" },
-              { phase: "Model Development & Training", duration: "6 months", status: "planned" },
-              { phase: "Clinical Validation", duration: "9 months", status: "planned" },
-              { phase: "Deployment & Integration", duration: "6 months", status: "planned" }
-            ],
-            attachments: [
-              { name: "Research_Proposal_Detailed.pdf", size: "2.8 MB", type: "pdf" },
-              { name: "Budget_Breakdown_Complete.xlsx", size: "1.2 MB", type: "excel" },
-              { name: "Technical_Specifications.docx", size: "3.1 MB", type: "word" },
-              { name: "Literature_Review.pdf", size: "4.5 MB", type: "pdf" },
-              { name: "Preliminary_Results.pptx", size: "15.2 MB", type: "powerpoint" }
-            ],
-            collaborators: [
-              { name: "Dr. Michael Chen", role: "Co-Investigator", institution: "AIIMS Delhi" },
-              { name: "Prof. Priya Sharma", role: "Technical Advisor", institution: "IIT Bombay" },
-              { name: "Dr. Rajesh Kumar", role: "Clinical Consultant", institution: "All India Institute of Medical Sciences" }
-            ]
+            keywords: ["Coal Gasification", "Energy Efficiency", "Carbon Capture", "Sustainable Mining", "Clean Coal Technology"],
+            projectLeader: "Dr. Raj Patel",
+            implementingAgency: "Indian Institute of Technology, Delhi",
+            coInvestigators: "Dr. Priya Sharma, Prof. Michael Chen, Dr. Anjali Verma",
+            richContent: `
+              <h2 style="color: black; font-weight: bold; font-size: 1.5em; margin: 1.5em 0 1em 0;">1. Problem Statement</h2>
+              <p style="color: black; line-height: 1.6; margin-bottom: 1em;">The coal sector faces significant challenges in optimizing energy extraction while minimizing environmental impact. Traditional coal combustion methods result in only 35-40% energy efficiency, with substantial CO2 emissions and particulate matter release. There is an urgent need for innovative gasification technologies that can improve energy output to 60-65% efficiency while reducing harmful emissions by 40-50%.</p>
+              
+              <p style="color: black; line-height: 1.6; margin-bottom: 1.5em;">Current coal processing facilities in India operate with outdated equipment that struggles to meet environmental compliance standards set by the Ministry of Coal. The lack of advanced gasification infrastructure limits the country's ability to maximize coal utilization for power generation and industrial applications.</p>
+              
+              <h2 style="color: black; font-weight: bold; font-size: 1.5em; margin: 1.5em 0 1em 0;">2. Research Objectives</h2>
+              <p style="color: black; font-weight: bold; margin-bottom: 0.5em;">Primary Objectives:</p>
+              <ul style="color: black; line-height: 1.6; margin-bottom: 1em; padding-left: 2em;">
+                <li style="margin-bottom: 0.5em;">Develop an integrated coal gasification system achieving 60%+ energy efficiency</li>
+                <li style="margin-bottom: 0.5em;">Design carbon capture mechanisms reducing CO2 emissions by 45%</li>
+                <li style="margin-bottom: 0.5em;">Create automated monitoring systems for real-time process optimization</li>
+                <li style="margin-bottom: 0.5em;">Establish economic viability models for large-scale implementation</li>
+              </ul>
+              
+              <p style="color: black; font-weight: bold; margin-bottom: 0.5em;">Secondary Objectives:</p>
+              <ul style="color: black; line-height: 1.6; margin-bottom: 1.5em; padding-left: 2em;">
+                <li style="margin-bottom: 0.5em;">Develop safety protocols for gasification operations</li>
+                <li style="margin-bottom: 0.5em;">Create training modules for technical personnel</li>
+                <li style="margin-bottom: 0.5em;">Establish environmental compliance frameworks</li>
+              </ul>
+              
+              <h2 style="color: black; font-weight: bold; font-size: 1.5em; margin: 1.5em 0 1em 0;">3. Justification & Significance</h2>
+              <p style="color: black; line-height: 1.6; margin-bottom: 1em;">Coal remains India's primary energy source, accounting for 70% of electricity generation. However, traditional combustion methods are inefficient and environmentally problematic. This research addresses critical national energy security concerns while advancing clean coal technologies.</p>
+              
+              <p style="color: black; line-height: 1.6; margin-bottom: 1.5em;">The proposed gasification technology aligns with India's commitment to reducing carbon emissions while maintaining energy independence. Successful implementation could revolutionize the coal industry, creating jobs while meeting environmental targets.</p>
+              
+              <h2 style="color: black; font-weight: bold; font-size: 1.5em; margin: 1.5em 0 1em 0;">4. Expected Outcomes & Benefits</h2>
+              <p style="color: black; line-height: 1.6; margin-bottom: 1em;">The expected outcomes include a 60%+ efficiency coal gasification system with integrated carbon capture, reducing environmental impact while maximizing energy output. The technology will be scalable for both existing and new coal facilities.</p>
+              
+              <p style="color: black; font-weight: bold; margin-bottom: 0.5em;">Quantifiable Benefits:</p>
+              <ul style="color: black; line-height: 1.6; margin-bottom: 1.5em; padding-left: 2em;">
+                <li style="margin-bottom: 0.5em;">25% reduction in coal consumption for same energy output</li>
+                <li style="margin-bottom: 0.5em;">45% reduction in CO2 emissions compared to traditional methods</li>
+                <li style="margin-bottom: 0.5em;">Creation of 500+ skilled jobs in coal technology sector</li>
+                <li style="margin-bottom: 0.5em;">Annual cost savings of ₹50 crores for medium-scale operations</li>
+              </ul>
+              
+              <h2 style="color: black; font-weight: bold; font-size: 1.5em; margin: 1.5em 0 1em 0;">5. Research Methodology</h2>
+              <p style="color: black; font-weight: bold; margin-bottom: 0.5em;">Phase 1: Laboratory Testing (Months 1-8)</p>
+              <ul style="color: black; line-height: 1.6; margin-bottom: 1em; padding-left: 2em;">
+                <li style="margin-bottom: 0.5em;">Coal characterization using X-ray fluorescence and thermogravimetric analysis</li>
+                <li style="margin-bottom: 0.5em;">Gasification reactor design using computational fluid dynamics modeling</li>
+                <li style="margin-bottom: 0.5em;">Catalyst development for enhanced reaction efficiency</li>
+                <li style="margin-bottom: 0.5em;">Small-scale prototype testing under controlled conditions</li>
+              </ul>
+              
+              <p style="color: black; font-weight: bold; margin-bottom: 0.5em;">Phase 2: Pilot Plant Development (Months 9-18)</p>
+              <ul style="color: black; line-height: 1.6; margin-bottom: 1.5em; padding-left: 2em;">
+                <li style="margin-bottom: 0.5em;">Construction of pilot-scale gasification facility</li>
+                <li style="margin-bottom: 0.5em;">Integration of carbon capture systems</li>
+                <li style="margin-bottom: 0.5em;">Performance testing with various coal grades</li>
+                <li style="margin-bottom: 0.5em;">Environmental impact assessment and monitoring</li>
+              </ul>
+              
+              <h2 style="color: black; font-weight: bold; font-size: 1.5em; margin: 1.5em 0 1em 0;">6. Work Plan & Implementation</h2>
+              <p style="color: black; line-height: 1.6; margin-bottom: 1em;">The project follows a systematic approach from laboratory-scale testing to pilot plant implementation. Each phase includes rigorous testing, data collection, and validation processes to ensure technology readiness for industrial deployment.</p>
+              
+              <p style="color: black; line-height: 1.6; margin-bottom: 1.5em;">Implementation will be coordinated with coal mining companies and power generation facilities to ensure practical applicability and industry adoption of the developed technology.</p>
+              
+              <h2 style="color: black; font-weight: bold; font-size: 1.5em; margin: 1.5em 0 1em 0;">7. Budget Breakdown</h2>
+              <table style="width: 100%; border-collapse: collapse; margin: 1.5em 0; color: black;">
+                <thead>
+                  <tr style="background-color: #f3f4f6;">
+                    <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left;">Category</th>
+                    <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left;">Amount (₹ Cr)</th>
+                    <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left;">Percentage</th>
+                    <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left;">Description</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">Equipment & Infrastructure</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">120</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">60%</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">Gasification reactors, monitoring systems</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">Personnel & Consulting</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">50</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">25%</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">Research staff, technical consultants</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">Materials & Testing</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">20</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">10%</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">Coal samples, catalysts, chemicals</td>
+                  </tr>
+                  <tr>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">Contingency</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">10</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">5%</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">Unforeseen expenses, equipment maintenance</td>
+                  </tr>
+                  <tr style="background-color: #f9fafb; font-weight: bold;">
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">Total Project Cost</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">200</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">100%</td>
+                    <td style="border: 1px solid #d1d5db; padding: 12px;">Complete project implementation</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              <h2 style="color: black; font-weight: bold; font-size: 1.5em; margin: 1.5em 0 1em 0;">8. Project Timeline</h2>
+              <p style="color: black; font-weight: bold; margin-bottom: 0.5em;">Year 1 (Months 1-12): Research & Development Phase</p>
+              <ul style="color: black; line-height: 1.6; margin-bottom: 1em; padding-left: 2em;">
+                <li style="margin-bottom: 0.5em;">Months 1-3: Coal characterization and catalyst development</li>
+                <li style="margin-bottom: 0.5em;">Months 4-8: Laboratory-scale gasification testing</li>
+                <li style="margin-bottom: 0.5em;">Months 9-12: Pilot plant design and construction initiation</li>
+              </ul>
+              
+              <p style="color: black; font-weight: bold; margin-bottom: 0.5em;">Year 2 (Months 13-24): Pilot Testing & Validation</p>
+              <ul style="color: black; line-height: 1.6; margin-bottom: 1.5em; padding-left: 2em;">
+                <li style="margin-bottom: 0.5em;">Months 13-18: Pilot plant construction and commissioning</li>
+                <li style="margin-bottom: 0.5em;">Months 19-22: Performance testing and optimization</li>
+                <li style="margin-bottom: 0.5em;">Months 23-24: Technology validation and documentation</li>
+              </ul>
+            `
           };
           setProposal(mockProposal);
         }
@@ -68,354 +165,285 @@ export default function ViewProposal() {
     fetchProposal();
   }, [id]);
 
+  const handleExport = async (type) => {
+    setIsExporting(true);
+    setExportType(type);
+    
+    // Simulate export process
+    setTimeout(() => {
+      if (type === 'pdf') {
+        // For demo, create a download link to a sample PDF
+        const link = document.createElement('a');
+        link.href = '/sample-proposal.pdf';
+        link.download = `${proposal.title.replace(/\s+/g, '_')}_Proposal.pdf`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      } else if (type === 'docx') {
+        // For demo, create a download link to a sample DOCX
+        const link = document.createElement('a');
+        link.href = '/sample-proposal.docx';
+        link.download = `${proposal.title.replace(/\s+/g, '_')}_Proposal.docx`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+      }
+      
+      setIsExporting(false);
+      setExportType('');
+    }, 2000);
+  };
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-900 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-slate-300"></div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
       </div>
     );
   }
 
   if (!proposal) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-900 flex items-center justify-center">
-        <div className="text-white text-xl">Proposal not found</div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
+        <div className="text-black text-xl">Proposal not found</div>
       </div>
     );
   }
 
   return (
-    <ProtectedRoute>
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-zinc-900 relative overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-slate-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gray-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
-          <div className="absolute top-40 left-40 w-80 h-80 bg-zinc-500 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
+      {/* Header Section with Government Branding */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex justify-between items-center mb-4">
+            <button
+              onClick={() => router.back()}
+              className="inline-flex items-center px-4 py-2 border border-gray-300 rounded-lg text-black bg-gray-100 hover:bg-gray-200 transition-colors"
+            >
+              <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+              </svg>
+              Back to Dashboard
+            </button>
+            
+            <div className="text-black text-sm">
+              Researcher: <span className="font-medium">{proposal.researcher}</span>
+            </div>
+          </div>
+          
+          <div className="text-center">
+            <h1 className="text-4xl font-bold text-blue-900 mb-2">View R&D Proposal</h1>
+            <p className="text-blue-700 text-lg">PRISM - Proposal Review & Innovation Support Mechanism</p>
+            <p className="text-black mt-2">Department of Coal (NaCCER) - Research Document</p>
+          </div>
         </div>
+      </div>
 
-        {/* Hero Section */}
-        <div className="relative z-10 pt-20 pb-16 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            {/* Navigation */}
-            <div className="flex items-center justify-between mb-8 animate-fade-in-up">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* Export Controls */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="flex justify-between items-center">
+            <div>
+              <h2 className="text-xl font-bold text-blue-900 mb-1">■ Export Options</h2>
+              <p className="text-black text-sm">Download this proposal in your preferred format</p>
+            </div>
+            
+            <div className="flex gap-3">
               <button
-                onClick={() => router.back()}
-                className="inline-flex items-center px-4 py-2 border border-slate-300 rounded-lg text-slate-200 bg-slate-800/30 hover:bg-slate-700/40 transition-all duration-200 backdrop-blur-sm"
+                onClick={() => handleExport('pdf')}
+                disabled={isExporting}
+                className="bg-red-600 hover:bg-red-700 disabled:bg-red-300 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2"
               >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back to Dashboard
+                {isExporting && exportType === 'pdf' ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    📄 Export as PDF
+                  </>
+                )}
               </button>
               
-              <div className="flex items-center space-x-4">
-                <div className="text-slate-200 text-sm">
-                  Researcher: <span className="text-white font-medium">{proposal.researcher}</span>
-                </div>
-                <div className="px-3 py-1 bg-slate-600/40 rounded-full text-slate-200 text-sm backdrop-blur-sm">
-                  View Mode
-                </div>
-              </div>
-            </div>
-
-            {/* Title Section */}
-            <div className="text-center mb-12 animate-fade-in-up animation-delay-200">
-              <h1 className="text-4xl md:text-5xl font-bold text-white mb-4 leading-tight">
-                Proposal Overview
-              </h1>
-              <p className="text-xl text-slate-200 max-w-3xl mx-auto">
-                Comprehensive view and detailed analysis of research proposals
-              </p>
+              <button
+                onClick={() => handleExport('docx')}
+                disabled={isExporting}
+                className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white px-6 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2"
+              >
+                {isExporting && exportType === 'docx' ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Exporting...
+                  </>
+                ) : (
+                  <>
+                    📝 Export as DOCX
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="relative z-10 px-4 sm:px-6 lg:px-8 pb-20">
-          <div className="max-w-5xl mx-auto">
-            {/* Proposal Header */}
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-slate-300/20 mb-8 animate-fade-in-up animation-delay-400">
-              <div className="flex flex-col lg:flex-row lg:items-start justify-between mb-6">
-                <div className="flex-1">
-                  <h2 className="text-3xl font-bold text-white mb-4">{proposal.title}</h2>
-                  <div className="flex flex-wrap items-center gap-4 text-slate-200 mb-6">
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      <span>{proposal.researcher}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                      </svg>
-                      <span>{proposal.institution}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v10m6-10v10" />
-                      </svg>
-                      <span>{new Date(proposal.submittedDate).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="lg:ml-6">
-                  <div className={`px-6 py-3 rounded-full text-sm font-medium ${
-                    proposal.status === 'approved' ? 'bg-green-500/20 text-green-300 border border-green-400/30' :
-                    proposal.status === 'rejected' ? 'bg-red-500/20 text-red-300 border border-red-400/30' :
-                    'bg-amber-500/20 text-amber-300 border border-amber-400/30'
-                  }`}>
-                    {proposal.status.replace('_', ' ').toUpperCase()}
-                  </div>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-slate-600/20 rounded-xl p-4 border border-slate-400/20">
-                  <div className="text-slate-300 text-sm mb-1">Domain</div>
-                  <div className="text-white font-semibold">{proposal.domain}</div>
-                </div>
-                <div className="bg-slate-600/20 rounded-xl p-4 border border-slate-400/20">
-                  <div className="text-slate-300 text-sm mb-1">Budget</div>
-                  <div className="text-white font-semibold">₹{proposal.budget.toLocaleString()}</div>
-                </div>
-                <div className="bg-slate-600/20 rounded-xl p-4 border border-slate-400/20">
-                  <div className="text-slate-300 text-sm mb-1">Duration</div>
-                  <div className="text-white font-semibold">{proposal.duration}</div>
-                </div>
+        {/* Proposal Header Information */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="grid md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-black mb-2">Project Title</label>
+              <div className="w-full px-4 py-3 border border-gray-300 rounded-md bg-gray-50 text-black">
+                {proposal.title}
               </div>
             </div>
-
-            {/* Description */}
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-slate-300/20 mb-8 animate-fade-in-up animation-delay-600">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Project Description
-              </h3>
-              <p className="text-slate-200 leading-relaxed text-lg">{proposal.description}</p>
-            </div>
-
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* Objectives */}
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-slate-300/20 animate-fade-in-up animation-delay-800">
-                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                  <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                  </svg>
-                  Research Objectives
-                </h3>
-                <div className="space-y-4">
-                  {proposal.objectives.map((objective, index) => (
-                    <div key={index} className="flex items-start gap-3 p-4 bg-slate-600/20 rounded-xl border border-slate-400/20">
-                      <div className="w-6 h-6 bg-slate-500/40 rounded-full flex items-center justify-center mt-1 flex-shrink-0">
-                        <span className="text-slate-200 text-sm font-bold">{index + 1}</span>
-                      </div>
-                      <p className="text-slate-200 leading-relaxed">{objective}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-
-              {/* Keywords */}
-              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-slate-300/20 animate-fade-in-up animation-delay-1000">
-                <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                  <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                  </svg>
-                  Keywords & Tags
-                </h3>
-                <div className="flex flex-wrap gap-3">
-                  {proposal.keywords.map((keyword, index) => (
-                    <span key={index} className="px-4 py-2 bg-slate-600/30 border border-slate-400/30 rounded-full text-slate-200 text-sm font-medium hover:bg-slate-600/50 transition-colors duration-200">
-                      {keyword}
-                    </span>
-                  ))}
-                </div>
+            
+            <div>
+              <label className="block text-sm font-semibold text-black mb-2">Implementing Agency</label>
+              <div className="w-full px-4 py-3 border border-gray-300 rounded-md bg-gray-50 text-black">
+                {proposal.institution}
               </div>
             </div>
-
-            {/* Methodology */}
-            <div className="mt-8 bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-slate-300/20 animate-fade-in-up animation-delay-1200">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
-                Research Methodology
-              </h3>
-              <p className="text-slate-200 leading-relaxed text-lg">{proposal.methodology}</p>
+            
+            <div>
+              <label className="block text-sm font-semibold text-black mb-2">Project Leader</label>
+              <div className="w-full px-4 py-3 border border-gray-300 rounded-md bg-gray-50 text-black">
+                {proposal.projectLeader}
+              </div>
             </div>
+            
+            <div>
+              <label className="block text-sm font-semibold text-black mb-2">Co-investigator(s)</label>
+              <div className="w-full px-4 py-3 border border-gray-300 rounded-md bg-gray-50 text-black">
+                {proposal.coInvestigators}
+              </div>
+            </div>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+            <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
+              <div className="text-blue-600 text-sm font-semibold mb-1">Domain</div>
+              <div className="text-black font-semibold">{proposal.domain}</div>
+            </div>
+            <div className="bg-green-50 rounded-lg p-4 border border-green-200">
+              <div className="text-green-600 text-sm font-semibold mb-1">Budget</div>
+              <div className="text-black font-semibold">₹{proposal.budget.toLocaleString()}</div>
+            </div>
+            <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
+              <div className="text-purple-600 text-sm font-semibold mb-1">Status</div>
+              <div className={`px-3 py-1 rounded-full text-sm font-semibold inline-block ${
+                proposal.status === 'approved' ? 'bg-green-100 text-green-800' :
+                proposal.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                'bg-amber-100 text-amber-800'
+              }`}>
+                {proposal.status.replace('_', ' ').toUpperCase()}
+              </div>
+            </div>
+          </div>
+        </div>
 
-            {/* Expected Outcomes */}
-            <div className="mt-8 bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-slate-300/20 animate-fade-in-up animation-delay-1400">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        {/* Rich Text Document Display */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h2 className="text-2xl font-bold text-blue-900 mb-6">▤ Proposal Content</h2>
+          
+          {/* Read-only Document Viewer */}
+          <div className="prose max-w-none">
+            <div className="border border-gray-300 rounded-md min-h-[600px] p-6 bg-gray-50">
+              <div 
+                className="focus:outline-none min-h-[550px] text-black"
+                dangerouslySetInnerHTML={{ __html: proposal.richContent }}
+                style={{ color: 'black' }}
+              />
+            </div>
+          </div>
+          
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-sm text-blue-800 font-semibold">📋 Document Summary:</p>
+            <div className="grid md:grid-cols-3 gap-4 mt-2 text-sm text-black">
+              <span>Research Domain: <strong>{proposal.domain}</strong></span>
+              <span>Budget: <strong>₹{proposal.budget.toLocaleString()}</strong></span>
+              <span>Duration: <strong>{proposal.duration}</strong></span>
+            </div>
+          </div>
+        </div>
+
+        {/* Keywords Section */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <h3 className="text-xl font-bold text-blue-900 mb-4 flex items-center gap-2">
+            🏷️ Keywords & Research Areas
+          </h3>
+          <div className="flex flex-wrap gap-3">
+            {proposal.keywords.map((keyword, index) => (
+              <span 
+                key={index} 
+                className="px-4 py-2 bg-blue-100 border border-blue-300 rounded-full text-blue-800 text-sm font-medium"
+              >
+                {keyword}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <button
+            onClick={() => router.push(`/proposal/track/${id}`)}
+            className="p-6 bg-white rounded-lg shadow-md border hover:shadow-lg transition-all duration-200 text-left"
+          >
+            <div className="flex items-center gap-4 mb-3">
+              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
-                Expected Outcomes
-              </h3>
-              <p className="text-slate-200 leading-relaxed text-lg">{proposal.expectedOutcomes}</p>
-            </div>
-
-            {/* Timeline */}
-            <div className="mt-8 bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-slate-300/20 animate-fade-in-up animation-delay-1600">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Project Timeline
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {proposal.timeline.map((phase, index) => (
-                  <div key={index} className="p-6 bg-slate-600/20 rounded-xl border border-slate-400/20">
-                    <div className="flex items-center justify-between mb-3">
-                      <h4 className="text-white font-semibold">{phase.phase}</h4>
-                      <span className="text-slate-300 text-sm font-medium">{phase.duration}</span>
-                    </div>
-                    <div className={`px-3 py-1 rounded-full text-xs font-medium inline-block ${
-                      phase.status === 'completed' ? 'bg-green-500/20 text-green-300 border border-green-400/30' :
-                      phase.status === 'active' ? 'bg-blue-500/20 text-blue-300 border border-blue-400/30' :
-                      'bg-slate-500/20 text-slate-300 border border-slate-400/30'
-                    }`}>
-                      {phase.status}
-                    </div>
-                  </div>
-                ))}
+              </div>
+              <div>
+                <div className="text-black font-semibold text-lg">Track Progress</div>
+                <div className="text-black text-sm">Monitor review status and updates</div>
               </div>
             </div>
+          </button>
 
-            {/* Attachments */}
-            <div className="mt-8 bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-slate-300/20 animate-fade-in-up animation-delay-1800">
-              <h3 className="text-xl font-bold text-white mb-6 flex items-center gap-3">
-                <svg className="w-6 h-6 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+          <button
+            onClick={() => router.push(`/proposal/collaborate/${id}`)}
+            className="p-6 bg-white rounded-lg shadow-md border hover:shadow-lg transition-all duration-200 text-left"
+          >
+            <div className="flex items-center gap-4 mb-3">
+              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h8z" />
                 </svg>
-                Supporting Documents
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {proposal.attachments.map((doc, index) => (
-                  <div key={index} className="flex items-center justify-between p-4 bg-slate-600/20 rounded-xl border border-slate-400/20 hover:bg-slate-600/30 transition-colors duration-200">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-slate-500/30 rounded-lg flex items-center justify-center">
-                        <svg className="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                      </div>
-                      <div>
-                        <div className="text-white font-medium">{doc.name}</div>
-                        <div className="text-slate-300 text-sm">{doc.size}</div>
-                      </div>
-                    </div>
-                    <button className="px-4 py-2 bg-slate-600/40 hover:bg-slate-600/60 text-slate-200 rounded-lg transition-colors duration-200 backdrop-blur-sm">
-                      Download
-                    </button>
-                  </div>
-                ))}
+              </div>
+              <div>
+                <div className="text-black font-semibold text-lg">Collaborate</div>
+                <div className="text-black text-sm">Join team discussion and review</div>
               </div>
             </div>
+          </button>
 
-            {/* Action Buttons */}
-            <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
-              <button
-                onClick={() => router.push(`/proposal/track/${id}`)}
-                className="p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-slate-300/20 hover:bg-white/20 transition-all duration-200 animate-fade-in-up animation-delay-2000"
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-slate-500/30 rounded-xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                  </div>
-                  <div className="text-left">
-                    <div className="text-white font-semibold">Track Progress</div>
-                    <div className="text-slate-200 text-sm">Monitor status</div>
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => router.push(`/proposal/collaborate/${id}`)}
-                className="p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-slate-300/20 hover:bg-white/20 transition-all duration-200 animate-fade-in-up animation-delay-2200"
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-slate-500/30 rounded-xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a2 2 0 01-2-2v-6a2 2 0 012-2h8z" />
-                    </svg>
-                  </div>
-                  <div className="text-left">
-                    <div className="text-white font-semibold">Collaborate</div>
-                    <div className="text-slate-200 text-sm">Join discussion</div>
-                  </div>
-                </div>
-              </button>
-
-              <button
-                onClick={() => window.print()}
-                className="p-6 bg-white/10 backdrop-blur-md rounded-2xl border border-slate-300/20 hover:bg-white/20 transition-all duration-200 animate-fade-in-up animation-delay-2400"
-              >
-                <div className="flex items-center gap-4 mb-4">
-                  <div className="w-12 h-12 bg-slate-500/30 rounded-xl flex items-center justify-center">
-                    <svg className="w-6 h-6 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H9.414a1 1 0 01-.707-.293l-2-2A1 1 0 005.586 6H4a2 2 0 00-2 2v4a2 2 0 002 2h2m3 4h6m-6 0l3-3m-3 3l3 3" />
-                    </svg>
-                  </div>
-                  <div className="text-left">
-                    <div className="text-white font-semibold">Export</div>
-                    <div className="text-slate-200 text-sm">Print or save</div>
-                  </div>
-                </div>
-              </button>
+          <button
+            onClick={() => router.push(`/proposal/edit/${id}`)}
+            className="p-6 bg-white rounded-lg shadow-md border hover:shadow-lg transition-all duration-200 text-left"
+          >
+            <div className="flex items-center gap-4 mb-3">
+              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-black font-semibold text-lg">Edit Proposal</div>
+                <div className="text-black text-sm">Make changes and updates</div>
+              </div>
             </div>
-          </div>
+          </button>
         </div>
-
-        <style jsx>{`
-          @keyframes blob {
-            0% { transform: translate(0px, 0px) scale(1); }
-            33% { transform: translate(30px, -50px) scale(1.1); }
-            66% { transform: translate(-20px, 20px) scale(0.9); }
-            100% { transform: translate(0px, 0px) scale(1); }
-          }
-          .animate-blob {
-            animation: blob 7s infinite;
-          }
-          .animation-delay-2000 {
-            animation-delay: 2s;
-          }
-          .animation-delay-4000 {
-            animation-delay: 4s;
-          }
-          @keyframes fade-in-up {
-            from {
-              opacity: 0;
-              transform: translateY(30px);
-            }
-            to {
-              opacity: 1;
-              transform: translateY(0);
-            }
-          }
-          .animate-fade-in-up {
-            animation: fade-in-up 0.6s ease-out forwards;
-          }
-          .animation-delay-200 { animation-delay: 0.2s; }
-          .animation-delay-400 { animation-delay: 0.4s; }
-          .animation-delay-600 { animation-delay: 0.6s; }
-          .animation-delay-800 { animation-delay: 0.8s; }
-          .animation-delay-1000 { animation-delay: 1.0s; }
-          .animation-delay-1200 { animation-delay: 1.2s; }
-          .animation-delay-1400 { animation-delay: 1.4s; }
-          .animation-delay-1600 { animation-delay: 1.6s; }
-          .animation-delay-1800 { animation-delay: 1.8s; }
-          .animation-delay-2000 { animation-delay: 2.0s; }
-          .animation-delay-2200 { animation-delay: 2.2s; }
-          .animation-delay-2400 { animation-delay: 2.4s; }
-        `}</style>
       </div>
+    </div>
+  );
+}
+
+export default function ViewProposal() {
+  return (
+    <ProtectedRoute>
+      <ViewProposalContent />
     </ProtectedRoute>
   );
 }

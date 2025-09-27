@@ -86,36 +86,37 @@ export default function Navbar() {
               <div className="flex items-center gap-6 cursor-pointer group">
                 {/* Government Section */}
                 <div className="flex items-center gap-4 text-white text-sm">
-                  <span className="font-medium">भारत सरकार</span>
-                  <div className="w-px h-4 bg-white/30"></div>
-                  <div className="flex items-center gap-2">
+                  <a href="https://www.india.gov.in/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:bg-white/10 px-2 py-1 rounded transition-colors">
                     <img 
-                      src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/Flag_of_India.svg/32px-Flag_of_India.svg.png" 
-                      alt="India Flag" 
-                      className="w-6 h-4"
+                      src="/images/GOI logo.png" 
+                      alt="Government of India Logo" 
+                      className="w-8 h-8 rounded"
                     />
-                    <span className="font-medium">Government of India</span>
+                    <div>
+                      <div className="font-medium">भारत सरकार</div>
+                      <div className="font-medium text-xs">Government of India</div>
+                    </div>
+                  </a>
+                  <div className="w-px h-8 bg-white/30"></div>
+                  <div className="flex items-center gap-3">
+                    <a href="https://www.coalindia.in/" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:bg-white/10 px-2 py-1 rounded transition-colors">
+                      <img 
+                        src="/images/coal india logo.webp" 
+                        alt="Coal India Limited" 
+                        className="w-8 h-8 rounded bg-white p-1"
+                      />
+                      <span className="font-medium text-xs">Coal India Limited</span>
+                    </a>
+                    <a href="https://www.cmpdi.co.in/en" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:bg-white/10 px-2 py-1 rounded transition-colors">
+                      <img 
+                        src="/images/cmpdi logo.jpg" 
+                        alt="CMPDI" 
+                        className="w-8 h-8 rounded bg-white p-1"
+                      />
+                      <span className="font-medium text-xs">CMPDI</span>
+                    </a>
                   </div>
-                  <div className="w-px h-6 bg-white/30 mx-2"></div>
-                </div>
-                
-                {/* Portal Logo & Name */}
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 overflow-hidden">
-                    <img 
-                      src="/images/prism brand logo.png" 
-                      alt="PRISM Logo" 
-                      className="w-full h-full object-contain"
-                    />
-                  </div>
-                  <div>
-                    <h1 className="text-xl font-bold group-hover:text-gray-200 transition-colors duration-300">
-                      PRISM Portal
-                    </h1>
-                    <p className="text-xs text-orange-100">
-                      Proposal Review & Innovation Support Mechanism
-                    </p>
-                  </div>
+                  <div className="w-px h-8 bg-white/30 mx-2"></div>
                 </div>
               </div>
             </Link>

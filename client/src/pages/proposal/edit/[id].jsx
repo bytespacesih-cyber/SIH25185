@@ -1,5 +1,15 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableCell } from '@tiptap/extension-table-cell';
+import { TableHeader } from '@tiptap/extension-table-header';
+import { Image } from '@tiptap/extension-image';
+import { Underline } from '@tiptap/extension-underline';
+import { TextAlign } from '@tiptap/extension-text-align';
+import { CharacterCount } from '@tiptap/extension-character-count';
 import { useAuth } from "../../../context/AuthContext";
 import ProtectedRoute from "../../../components/ProtectedRoute";
 
@@ -10,16 +20,260 @@ function EditProposalContent() {
   const [proposal, setProposal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    budget: '',
-    duration: '',
-    keywords: '',
-    objectives: '',
-    methodology: '',
-    expectedOutcomes: ''
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
+  const [characterCount, setCharacterCount] = useState(0);
+  const [chatMessages, setChatMessages] = useState([
+    { type: 'bot', text: 'Hello! I\'m here to help you edit your coal R&D proposal. I can assist with revisions, technical writing improvements, and compliance checks. What would you like to work on?' }
+  ]);
+  const [currentMessage, setCurrentMessage] = useState('');
+  
+  // Version history dummy data
+  const [versionHistory] = useState([
+    {
+      id: 1,
+      version: "Version 3.2",
+      date: "2025-09-26",
+      time: "14:30",
+      author: "Dr. Sarah Chen",
+      changes: "Updated methodology section and budget allocation",
+      status: "current"
+    },
+    {
+      id: 2,
+      version: "Version 3.1", 
+      date: "2025-09-25",
+      time: "16:45",
+      author: "Dr. Sarah Chen",
+      changes: "Added environmental impact assessment details",
+      status: "saved"
+    },
+    {
+      id: 3,
+      version: "Version 3.0",
+      date: "2025-09-24",
+      time: "11:20",
+      author: "Prof. Michael Kumar",
+      changes: "Major revision: restructured objectives and timeline",
+      status: "saved"
+    },
+    {
+      id: 4,
+      version: "Version 2.5",
+      date: "2025-09-23",
+      time: "09:15",
+      author: "Dr. Sarah Chen", 
+      changes: "Incorporated reviewer feedback on coal processing methods",
+      status: "saved"
+    },
+    {
+      id: 5,
+      version: "Version 2.0",
+      date: "2025-09-20",
+      time: "13:30",
+      author: "Dr. Sarah Chen",
+      changes: "Initial draft submitted for peer review",
+      status: "saved"
+    }
+  ]);
+
+  // Rich text editor configuration
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      CharacterCount,
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      Image.configure({
+        inline: true,
+        allowBase64: true,
+      }),
+    ],
+    content: `
+      <h1 style="color: black; text-align: center;">Advanced Coal Gasification Technology for Enhanced Energy Production</h1>
+      
+      <h2 style="color: black;">1. Problem Statement</h2>
+      <p style="color: black;">The coal sector faces significant challenges in optimizing energy extraction while minimizing environmental impact. Traditional coal combustion methods result in only 35-40% energy efficiency, with substantial CO2 emissions and particulate matter release. There is an urgent need for innovative gasification technologies that can improve energy output to 60-65% efficiency while reducing harmful emissions by 40-50%.</p>
+      
+      <p style="color: black;">Current coal processing facilities in India operate with outdated equipment that struggles to meet environmental compliance standards set by the Ministry of Coal. The lack of advanced gasification infrastructure limits the country's ability to maximize coal utilization for power generation and industrial applications.</p>
+      
+      <h2 style="color: black;">2. Research Objectives</h2>
+      <p style="color: black;"><strong>Primary Objectives:</strong></p>
+      <ul style="color: black;">
+        <li>Develop an integrated coal gasification system achieving 60%+ energy efficiency</li>
+        <li>Design carbon capture mechanisms reducing CO2 emissions by 45%</li>
+        <li>Create automated monitoring systems for real-time process optimization</li>
+        <li>Establish economic viability models for large-scale implementation</li>
+      </ul>
+      
+      <p style="color: black;"><strong>Secondary Objectives:</strong></p>
+      <ul style="color: black;">
+        <li>Train technical personnel in advanced gasification operations</li>
+        <li>Develop maintenance protocols for extended equipment lifespan</li>
+        <li>Create safety standards for gasification plant operations</li>
+        <li>Establish environmental monitoring frameworks</li>
+      </ul>
+      
+      <h2 style="color: black;">3. Justification & Significance</h2>
+      <p style="color: black;">This research addresses critical national priorities in energy security and environmental sustainability. With India's coal reserves estimated at 350+ billion tonnes, optimizing extraction and utilization efficiency directly impacts economic growth and energy independence.</p>
+      
+      <p style="color: black;">The proposed gasification technology will:</p>
+      <ul style="color: black;">
+        <li>Reduce India's carbon footprint from coal-based power generation</li>
+        <li>Create employment opportunities in advanced manufacturing and operations</li>
+        <li>Position India as a leader in clean coal technologies</li>
+        <li>Generate intellectual property and export potential for technology transfer</li>
+      </ul>
+      
+      <h2 style="color: black;">4. Expected Outcomes & Benefits</h2>
+      <p style="color: black;"><strong>Technical Outcomes:</strong></p>
+      <ul style="color: black;">
+        <li>Functional prototype demonstrating 60% energy conversion efficiency</li>
+        <li>Integrated carbon capture system with 45% emission reduction</li>
+        <li>Automated control systems with predictive maintenance capabilities</li>
+        <li>Comprehensive performance databases for optimization</li>
+      </ul>
+      
+      <p style="color: black;"><strong>Economic Benefits:</strong></p>
+      <ul style="color: black;">
+        <li>₹500 crores potential cost savings annually across coal sector</li>
+        <li>20% reduction in operational costs per MW generated</li>
+        <li>Export market potential worth ₹2,000 crores over 5 years</li>
+        <li>Job creation for 5,000+ technical positions nationwide</li>
+      </ul>
+      
+      <h2 style="color: black;">5. Research Methodology</h2>
+      <p style="color: black;"><strong>Phase 1: Laboratory Testing (Months 1-8)</strong></p>
+      <ul style="color: black;">
+        <li>Coal characterization using X-ray fluorescence and thermogravimetric analysis</li>
+        <li>Gasification reactor design using computational fluid dynamics modeling</li>
+        <li>Catalyst development for enhanced reaction efficiency</li>
+        <li>Small-scale prototype testing under controlled conditions</li>
+      </ul>
+      
+      <p style="color: black;"><strong>Phase 2: Pilot Plant Development (Months 9-18)</strong></p>
+      <ul style="color: black;">
+        <li>Scaling up reactor design to 10 MW capacity</li>
+        <li>Integration of carbon capture and storage systems</li>
+        <li>Implementation of automated control and monitoring systems</li>
+        <li>Environmental impact assessment and compliance testing</li>
+      </ul>
+      
+      <p style="color: black;"><strong>Phase 3: Field Testing & Validation (Months 19-24)</strong></p>
+      <ul style="color: black;">
+        <li>Installation at selected coal power plant facility</li>
+        <li>6-month continuous operation testing</li>
+        <li>Performance optimization and troubleshooting</li>
+        <li>Economic viability analysis and cost-benefit evaluation</li>
+      </ul>
+      
+      <h2 style="color: black;">6. Work Plan & Implementation</h2>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <thead>
+          <tr style="background-color: #f3f4f6;">
+            <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left; color: black;">Phase</th>
+            <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left; color: black;">Duration</th>
+            <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left; color: black;">Key Deliverables</th>
+            <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left; color: black;">Budget (₹ Cr)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">Laboratory Testing</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">8 months</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">Reactor design, catalyst development</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">45</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">Pilot Plant</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">10 months</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">10 MW pilot system</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">125</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">Field Testing</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">6 months</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">Performance validation</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">30</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <h2 style="color: black;">7. Budget Breakdown</h2>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <thead>
+          <tr style="background-color: #f3f4f6;">
+            <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left; color: black;">Category</th>
+            <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left; color: black;">Amount (₹ Cr)</th>
+            <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left; color: black;">Percentage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">Equipment & Infrastructure</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">120</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">60%</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">Personnel & Consulting</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">50</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">25%</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">Materials & Testing</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">20</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">10%</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">Administrative & Miscellaneous</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">10</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">5%</td>
+          </tr>
+          <tr style="background-color: #f9fafb; font-weight: bold;">
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">Total Project Cost</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">200</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">100%</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <h2 style="color: black;">8. Project Timeline</h2>
+      <p style="color: black;"><strong>Year 1 (Months 1-12):</strong> Laboratory testing and reactor design optimization</p>
+      <p style="color: black;"><strong>Year 2 (Months 13-24):</strong> Pilot plant construction, testing, and field validation</p>
+      
+      <p style="color: black;"><strong>Key Milestones:</strong></p>
+      <ul style="color: black;">
+        <li>Month 6: Complete reactor design and catalyst development</li>
+        <li>Month 12: Laboratory prototype demonstrating 55%+ efficiency</li>
+        <li>Month 18: Pilot plant operational with integrated systems</li>
+        <li>Month 24: Field testing complete with performance validation</li>
+      </ul>
+    `,
+    immediatelyRender: false,
+    onUpdate: ({ editor }) => {
+      if (editor.storage.characterCount) {
+        setWordCount(editor.storage.characterCount.words());
+        setCharacterCount(editor.storage.characterCount.characters());
+      }
+    },
   });
+
+  // Update counts when editor is ready
+  useEffect(() => {
+    if (editor && editor.storage.characterCount) {
+      setWordCount(editor.storage.characterCount.words());
+      setCharacterCount(editor.storage.characterCount.characters());
+    }
+  }, [editor]);
 
   useEffect(() => {
     if (id) {
@@ -29,447 +283,467 @@ function EditProposalContent() {
 
   const fetchProposal = async () => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/proposals/${id}`, {
-        headers: { 
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        }
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        setProposal(data);
-        populateForm(data);
-      } else {
-        // Mock data for demonstration
+      // Simulate loading time
+      setTimeout(() => {
         const mockData = {
           id: id,
-          title: "AI-Powered Healthcare Diagnosis System",
-          description: "A comprehensive research proposal to develop an artificial intelligence system for healthcare diagnosis, leveraging machine learning algorithms to improve diagnostic accuracy and reduce time-to-diagnosis in clinical settings.",
-          status: "draft",
-          author: user?.name || "John Researcher",
-          department: user?.department || "Computer Science",
+          title: "Advanced Coal Gasification Technology for Enhanced Energy Production",
+          projectLeader: "Dr. Sarah Chen",
+          implementingAgency: "Indian Institute of Technology Delhi",
+          coInvestigators: "Prof. Michael Kumar, Dr. Rajesh Sharma",
+          status: "under_review",
+          author: user?.name || "Dr. Sarah Chen",
+          department: "Department of Coal Mining Engineering",
           createdAt: "2025-09-20",
-          budget: "$150,000",
-          duration: "24 months",
-          keywords: ["Artificial Intelligence", "Healthcare", "Machine Learning", "Medical Diagnosis"],
-          objectives: [
-            "Develop a machine learning model for medical image analysis",
-            "Create a user-friendly interface for healthcare professionals",
-            "Validate the system through clinical trials",
-            "Ensure compliance with healthcare data regulations"
-          ],
-          methodology: "We will employ a combination of convolutional neural networks (CNNs) and transformer architectures to analyze medical imaging data. The system will be trained on anonymized patient data from multiple healthcare institutions.",
-          expectedOutcomes: "The expected outcome is a 25% improvement in diagnostic accuracy compared to traditional methods, with reduced diagnosis time from hours to minutes."
+          lastModified: "2025-09-26",
+          version: "3.2"
         };
         setProposal(mockData);
-        populateForm(mockData);
-      }
+        setLoading(false);
+      }, 1000);
     } catch (error) {
       console.error("Error fetching proposal:", error);
-      // Fallback mock data
-      const mockData = {
-        id: id,
-        title: "AI-Powered Healthcare Diagnosis System",
-        description: "A comprehensive research proposal to develop an artificial intelligence system for healthcare diagnosis.",
-        budget: "$150,000",
-        duration: "24 months",
-        keywords: ["Artificial Intelligence", "Healthcare"],
-        objectives: ["Develop AI diagnostic tools"],
-        methodology: "Machine learning approach",
-        expectedOutcomes: "Improved diagnostic accuracy"
-      };
-      setProposal(mockData);
-      populateForm(mockData);
-    } finally {
       setLoading(false);
     }
   };
 
-  const populateForm = (data) => {
-    setFormData({
-      title: data.title || '',
-      description: data.description || '',
-      budget: data.budget || '',
-      duration: data.duration || '',
-      keywords: Array.isArray(data.keywords) ? data.keywords.join(', ') : (data.keywords || ''),
-      objectives: Array.isArray(data.objectives) ? data.objectives.join('\n') : (data.objectives || ''),
-      methodology: data.methodology || '',
-      expectedOutcomes: data.expectedOutcomes || ''
-    });
+  const handleChatSubmit = (e) => {
+    e.preventDefault();
+    if (!currentMessage.trim()) return;
+
+    const newMessages = [...chatMessages, { type: 'user', text: currentMessage }];
+    setChatMessages(newMessages);
+
+    // Simulate AI responses for editing assistance
+    setTimeout(() => {
+      const aiResponses = [
+        "I notice your methodology section is comprehensive. Consider adding more details about quality control measures for coal characterization.",
+        "The budget allocation looks well-structured. You might want to include contingency funds (5-10%) for unexpected equipment costs.",
+        "Your timeline is realistic. Consider adding specific review milestones for stakeholder feedback at each phase.",
+        "The environmental impact section could benefit from more quantitative data on emission reductions.",
+        "For better compliance, include references to relevant IS/BIS standards for coal processing equipment.",
+        "Consider expanding on the risk mitigation strategies for potential technical challenges.",
+        "The economic analysis is strong. You might add job creation estimates for local communities."
+      ];
+      const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+      setChatMessages(prev => [...prev, { type: 'bot', text: randomResponse }]);
+    }, 1000);
+
+    setCurrentMessage('');
   };
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
+  const insertTable = () => {
+    if (editor) {
+      editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+    }
+  };
+
+  const insertImage = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (editor) {
+            editor.chain().focus().setImage({ src: e.target.result }).run();
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
   };
 
   const handleSave = async () => {
     setSaving(true);
     try {
-      const token = localStorage.getItem("token");
-      const proposalData = {
-        ...formData,
-        keywords: formData.keywords.split(',').map(k => k.trim()),
-        objectives: formData.objectives.split('\n').filter(o => o.trim())
-      };
-
-      const response = await fetch(`http://localhost:5000/api/proposals/${id}`, {
-        method: 'PUT',
-        headers: {
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(proposalData)
-      });
-
-      if (response.ok) {
-        alert('Proposal updated successfully!');
-        router.push(`/proposal/view/${id}`);
-      } else {
-        // Simulate success for demo
-        alert('Proposal updated successfully! (Demo mode)');
-        router.push(`/proposal/view/${id}`);
-      }
+      // Simulate saving with backend
+      setTimeout(() => {
+        alert('Proposal changes saved successfully! New version 3.3 created.');
+        setSaving(false);
+        // Update version in proposal data
+        setProposal(prev => ({
+          ...prev,
+          version: "3.3",
+          lastModified: new Date().toISOString().split('T')[0]
+        }));
+      }, 2000);
     } catch (error) {
       console.error("Error saving proposal:", error);
-      alert('Proposal updated successfully! (Demo mode)');
-      router.push(`/proposal/view/${id}`);
-    } finally {
+      alert('Error saving proposal. Please try again.');
       setSaving(false);
     }
   };
 
+  const loadVersion = (versionData) => {
+    // Simulate loading different version content
+    alert(`Loading ${versionData.version}... (Demo: This would load the actual content from that version)`);
+  };
+
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-xl font-semibold text-gray-600">Loading proposal...</div>
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="text-xl font-semibold text-blue-900">Loading proposal document...</div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-orange-50/30 to-amber-50/20">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-orange-600 via-amber-600 to-red-700 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-600/90 via-transparent to-red-700/90"></div>
-        
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full animate-float"></div>
-          <div className="absolute top-40 -left-20 w-60 h-60 bg-amber-300/10 rounded-full animate-float animation-delay-1000"></div>
-          <div className="absolute -bottom-20 right-20 w-40 h-40 bg-orange-300/10 rounded-full animate-float animation-delay-2000"></div>
-        </div>
-
-        <nav className="relative z-10 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex justify-between items-center h-16">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                  </svg>
-                </div>
-                <span className="text-xl font-bold">ByteSpace</span>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
+      {/* Header Section */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-blue-900 mb-1">Edit R&D Proposal</h1>
+              <p className="text-blue-700">PRISM - Proposal Review & Innovation Support Mechanism</p>
+              <div className="flex items-center gap-4 mt-2 text-sm text-black">
+                <span>Proposal ID: #{id}</span>
+                <span>•</span>
+                <span>Version: {proposal?.version || "3.2"}</span>
+                <span>•</span>
+                <span>Last Modified: {proposal?.lastModified || "2025-09-26"}</span>
               </div>
-              <button 
-                onClick={() => router.back()}
-                className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm transition-all duration-300 font-semibold flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Cancel
-              </button>
             </div>
-          </div>
-        </nav>
-
-        <div className="relative z-10 py-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in-up">
-              Edit Your 
-              <span className="block bg-gradient-to-r from-amber-300 to-orange-300 bg-clip-text text-transparent">
-                Research Proposal
-              </span>
-            </h1>
-            <p className="text-xl text-orange-100 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200">
-              Refine and perfect your research proposal with our comprehensive editing tools
-            </p>
-            <div className="mt-8 animate-fade-in-up animation-delay-400">
-              <div className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-orange-100 font-semibold">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Proposal ID: #{id}
-              </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowVersionHistory(!showVersionHistory)}
+                className="bg-gray-100 hover:bg-gray-200 text-black px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+                title="Version History"
+              >
+                ◷ Versions
+              </button>
+              <button
+                onClick={() => router.back()}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+              >
+                ← Back
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="bg-gradient-to-br from-white via-orange-50/30 to-amber-50/20 rounded-3xl shadow-2xl border border-orange-200/50 overflow-hidden animate-fade-in-up animation-delay-600">
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* AI Assistant Toggle */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <button
+            onClick={() => setShowAIAssistant(!showAIAssistant)}
+            className="bg-purple-600 text-white p-4 rounded-full shadow-lg hover:bg-purple-700 transition-colors"
+            title="AI Assistant"
+          >
+            ⚡
+          </button>
+        </div>
 
-          {/* Header Section */}
-          <div className="p-8 border-b border-orange-200/70 bg-gradient-to-r from-orange-500 to-amber-600">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                </svg>
-              </div>
-              <div>
-                <h2 className="text-2xl font-bold text-white">Edit Research Proposal</h2>
-                <p className="text-orange-100 font-medium">Update and refine your research details</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Form */}
-          <div className="p-8 space-y-8">
-            {/* Title */}
-            <div className="animate-fade-in-up animation-delay-800">
-              <label className="block text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
-                <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                Title
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title}
-                onChange={handleInputChange}
-                className="w-full p-4 border-2 border-orange-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-slate-900 bg-white/90 font-medium placeholder-orange-400 transition-all duration-300 hover:shadow-md"
-                placeholder="Enter your research proposal title..."
-              />
-            </div>
-
-            {/* Description */}
-            <div className="animate-fade-in-up animation-delay-1000">
-              <label className="block text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
-                <div className="w-6 h-6 bg-gradient-to-br from-orange-500 to-amber-600 rounded-lg flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                </div>
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description}
-                onChange={handleInputChange}
-                rows="6"
-                className="w-full p-4 border-2 border-orange-300 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-slate-900 bg-white/90 font-medium placeholder-orange-400 transition-all duration-300 hover:shadow-md resize-none"
-                placeholder="Provide a comprehensive description of your research proposal, including goals, scope, and significance..."
-              />
-            </div>
-
-            {/* Budget and Duration */}
-            <div className="grid md:grid-cols-2 gap-6 animate-fade-in-up animation-delay-1200">
-              <div>
-                <label className="block text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
-                  <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                    </svg>
+        <div className={`grid gap-8 ${showAIAssistant || showVersionHistory ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'} transition-all duration-300`}>
+          {/* Main Content Section */}
+          <div className={showAIAssistant || showVersionHistory ? 'lg:col-span-2' : 'col-span-1'}>
+            {/* Document Editor */}
+            <div className="bg-white rounded-lg shadow-md p-6">
+              <div className="mb-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h2 className="text-2xl font-bold text-blue-900">▤ Proposal Document</h2>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm text-black">Auto-save enabled</span>
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
                   </div>
-                  Budget
-                </label>
-                <input
-                  type="text"
-                  name="budget"
-                  value={formData.budget}
-                  onChange={handleInputChange}
-                  className="w-full p-4 border-2 border-green-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-green-500 text-slate-900 bg-white/90 font-medium placeholder-green-400 transition-all duration-300 hover:shadow-md"
-                  placeholder="e.g., ₹25,00,000 or $150,000"
-                />
-              </div>
-              <div>
-                <label className="block text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
-                  <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-lg flex items-center justify-center">
-                    <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                </div>
+                
+                {/* Formatting Toolbar */}
+                <div className="border border-gray-200 rounded-md p-3 mb-4 bg-gray-50">
+                  {/* First Row - Basic Formatting */}
+                  <div className="flex gap-1 items-center mb-2">
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleBold().run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive('bold') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                      title="Bold"
+                    >
+                      <strong>B</strong>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleItalic().run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive('italic') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                      title="Italic"
+                    >
+                      <em>I</em>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleUnderline?.().run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive('underline') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                      title="Underline"
+                    >
+                      <u>U</u>
+                    </button>
+                    
+                    <div className="w-px bg-gray-300 mx-2 h-6"></div>
+                    
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive('heading', { level: 1 }) ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                      title="Heading 1"
+                    >
+                      H1
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive('heading', { level: 2 }) ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                      title="Heading 2"
+                    >
+                      H2
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().setParagraph().run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive('paragraph') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                      title="Paragraph"
+                    >
+                      P
+                    </button>
+                    
+                    <div className="w-px bg-gray-300 mx-2 h-6"></div>
+                    
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive('bulletList') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                      title="Bullet List"
+                    >
+                      • List
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive('orderedList') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                      title="Numbered List"
+                    >
+                      1. List
+                    </button>
                   </div>
-                  Duration
-                </label>
-                <input
-                  type="text"
-                  name="duration"
-                  value={formData.duration}
-                  onChange={handleInputChange}
-                  className="w-full p-4 border-2 border-blue-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-slate-900 bg-white/90 font-medium placeholder-blue-400 transition-all duration-300 hover:shadow-md"
-                  placeholder="e.g., 24 months or 2 years"
-                />
+                  
+                  {/* Second Row */}
+                  <div className="flex gap-1 items-center">
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().setTextAlign('left').run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive({ textAlign: 'left' }) ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                      title="Align Left"
+                    >
+                      ⬅
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().setTextAlign('center').run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive({ textAlign: 'center' }) ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                      title="Center"
+                    >
+                      ↔
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().setTextAlign('right').run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive({ textAlign: 'right' }) ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                      title="Align Right"
+                    >
+                      ➡
+                    </button>
+                    
+                    <div className="w-px bg-gray-300 mx-2 h-6"></div>
+                    
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().undo().run()}
+                      className="bg-black text-white px-3 py-2 rounded text-sm hover:bg-gray-800"
+                      title="Undo"
+                    >
+                      ↶
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().redo().run()}
+                      className="bg-black text-white px-3 py-2 rounded text-sm hover:bg-gray-800"
+                      title="Redo"
+                    >
+                      ↷
+                    </button>
+                    
+                    <div className="w-px bg-gray-300 mx-2 h-6"></div>
+                    
+                    <button
+                      type="button"
+                      onClick={insertTable}
+                      className="bg-black text-white px-3 py-2 rounded text-sm hover:bg-gray-800"
+                      title="Insert Table"
+                    >
+                      ▦ Table
+                    </button>
+                    <button
+                      type="button"
+                      onClick={insertImage}
+                      className="bg-black text-white px-3 py-2 rounded text-sm hover:bg-gray-800"
+                      title="Insert Image"
+                    >
+                      ▣ Image
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().setHorizontalRule().run()}
+                      className="bg-black text-white px-3 py-2 rounded text-sm hover:bg-gray-800"
+                      title="Insert Line"
+                    >
+                      ─ Line
+                    </button>
+                  </div>
+                </div>
               </div>
-            </div>
-
-            {/* Keywords */}
-            <div className="animate-fade-in-up animation-delay-1400">
-              <label className="block text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
-                <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-violet-600 rounded-lg flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                  </svg>
+              
+              {/* Editor Content */}
+              <div className="prose max-w-none">
+                <div className="border border-gray-300 rounded-md min-h-[600px] p-6 bg-white">
+                  <EditorContent 
+                    editor={editor} 
+                    className="focus:outline-none min-h-[550px] text-black"
+                    style={{ color: 'black' }}
+                  />
                 </div>
-                Keywords
-              </label>
-              <input
-                type="text"
-                name="keywords"
-                value={formData.keywords}
-                onChange={handleInputChange}
-                className="w-full p-4 border-2 border-purple-300 rounded-xl focus:ring-2 focus:ring-purple-500 focus:border-purple-500 text-slate-900 bg-white/90 font-medium placeholder-purple-400 transition-all duration-300 hover:shadow-md"
-                placeholder="AI, Machine Learning, Healthcare, Research..."
-              />
-              <p className="text-sm text-purple-600 mt-2 font-medium">💡 Separate multiple keywords with commas for better categorization</p>
-            </div>
-
-            {/* Objectives */}
-            <div className="animate-fade-in-up animation-delay-1600">
-              <label className="block text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
-                <div className="w-6 h-6 bg-gradient-to-br from-red-500 to-pink-600 rounded-lg flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                  </svg>
+              </div>
+              
+              {/* Stats and Actions */}
+              <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
+                <div className="flex items-center gap-6 text-sm text-black">
+                  <span><strong>Words: {wordCount}</strong></span>
+                  <span><strong>Characters: {characterCount}</strong></span>
+                  <span className="text-green-600">✓ Last saved: Just now</span>
                 </div>
-                Research Objectives
-              </label>
-              <textarea
-                name="objectives"
-                value={formData.objectives}
-                onChange={handleInputChange}
-                rows="5"
-                className="w-full p-4 border-2 border-red-300 rounded-xl focus:ring-2 focus:ring-red-500 focus:border-red-500 text-slate-900 bg-white/90 font-medium placeholder-red-400 transition-all duration-300 hover:shadow-md resize-none"
-                placeholder="• Develop innovative AI algorithms for healthcare diagnostics&#10;• Conduct comprehensive testing and validation&#10;• Publish findings in peer-reviewed journals..."
-              />
-              <p className="text-sm text-red-600 mt-2 font-medium">🎯 Enter each objective on a new line for better organization</p>
-            </div>
-
-            {/* Methodology */}
-            <div className="animate-fade-in-up animation-delay-1800">
-              <label className="block text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
-                <div className="w-6 h-6 bg-gradient-to-br from-teal-500 to-cyan-600 rounded-lg flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                  </svg>
-                </div>
-                Research Methodology
-              </label>
-              <textarea
-                name="methodology"
-                value={formData.methodology}
-                onChange={handleInputChange}
-                rows="6"
-                className="w-full p-4 border-2 border-teal-300 rounded-xl focus:ring-2 focus:ring-teal-500 focus:border-teal-500 text-slate-900 bg-white/90 font-medium placeholder-teal-400 transition-all duration-300 hover:shadow-md resize-none"
-                placeholder="Describe your research approach, methods, tools, and techniques that will be used to achieve your objectives..."
-              />
-            </div>
-
-            {/* Expected Outcomes */}
-            <div className="animate-fade-in-up animation-delay-2000">
-              <label className="block text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
-                <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
-                Expected Outcomes & Impact
-              </label>
-              <textarea
-                name="expectedOutcomes"
-                value={formData.expectedOutcomes}
-                onChange={handleInputChange}
-                rows="4"
-                className="w-full p-4 border-2 border-indigo-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-slate-900 bg-white/90 font-medium placeholder-indigo-400 transition-all duration-300 hover:shadow-md resize-none"
-                placeholder="Describe the anticipated results, potential impact on the field, and how this research will benefit society..."
-              />
-            </div>
-
-            {/* Actions */}
-            <div className="border-t border-orange-200/70 pt-8 animate-fade-in-up animation-delay-2200">
-              <div className="flex flex-wrap gap-4 justify-center">
                 <button
                   onClick={handleSave}
                   disabled={saving}
-                  className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-8 py-4 rounded-xl font-bold hover:from-green-600 hover:to-emerald-700 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed hover:shadow-lg transform hover:scale-105 flex items-center gap-2"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors flex items-center gap-2 disabled:opacity-50"
                 >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                  {saving ? 'Saving Changes...' : 'Save Changes'}
-                </button>
-                <button
-                  onClick={() => router.push(`/proposal/view/${id}`)}
-                  className="bg-gradient-to-r from-blue-500 to-indigo-600 text-white px-8 py-4 rounded-xl font-bold hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 hover:shadow-lg transform hover:scale-105 flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                  </svg>
-                  Preview
-                </button>
-                <button
-                  onClick={() => router.back()}
-                  className="bg-gradient-to-r from-slate-500 to-gray-600 text-white px-8 py-4 rounded-xl font-bold hover:from-slate-600 hover:to-gray-700 transition-all duration-300 hover:shadow-lg transform hover:scale-105 flex items-center gap-2"
-                >
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  Cancel
+                  {saving ? '⟳ Saving...' : '💾 Save Changes'}
                 </button>
               </div>
             </div>
           </div>
-        </div>
-      </main>
 
-      <style jsx>{`
-        @keyframes fade-in-up {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-        
-        .animate-fade-in-up {
-          animation: fade-in-up 0.6s ease-out forwards;
-        }
-        
-        .animate-float {
-          animation: float 3s ease-in-out infinite;
-        }
-        
-        .animation-delay-200 { animation-delay: 0.2s; }
-        .animation-delay-400 { animation-delay: 0.4s; }
-        .animation-delay-600 { animation-delay: 0.6s; }
-        .animation-delay-800 { animation-delay: 0.8s; }
-        .animation-delay-1000 { animation-delay: 1.0s; }
-        .animation-delay-1200 { animation-delay: 1.2s; }
-        .animation-delay-1400 { animation-delay: 1.4s; }
-        .animation-delay-1600 { animation-delay: 1.6s; }
-        .animation-delay-1800 { animation-delay: 1.8s; }
-        .animation-delay-2000 { animation-delay: 2.0s; }
-        .animation-delay-2200 { animation-delay: 2.2s; }
-      `}</style>
+          {/* Version History Sidebar */}
+          {showVersionHistory && (
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow-md overflow-hidden sticky top-4">
+                <div className="bg-blue-600 text-white p-4">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    ◷ Version History
+                  </h3>
+                  <p className="text-blue-100 text-sm">Track changes and revisions</p>
+                </div>
+                
+                <div className="max-h-96 overflow-y-auto p-4">
+                  {versionHistory.map((version) => (
+                    <div key={version.id} className="mb-4 p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer" onClick={() => loadVersion(version)}>
+                      <div className="flex justify-between items-start mb-2">
+                        <div className="font-semibold text-black">{version.version}</div>
+                        <div className={`px-2 py-1 text-xs rounded-full ${
+                          version.status === 'current' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-black'
+                        }`}>
+                          {version.status === 'current' ? 'Current' : 'Saved'}
+                        </div>
+                      </div>
+                      <div className="text-sm text-black mb-2">
+                        {version.date} at {version.time}
+                      </div>
+                      <div className="text-sm text-black mb-2">
+                        <strong>By:</strong> {version.author}
+                      </div>
+                      <div className="text-xs text-gray-700">
+                        {version.changes}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* AI Assistant Sidebar */}
+          {showAIAssistant && (
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow-md overflow-hidden sticky top-4">
+                <div className="bg-purple-600 text-white p-4">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    ⚡ AI Editing Assistant
+                  </h3>
+                  <p className="text-purple-100 text-sm">Get help with revisions and improvements</p>
+                </div>
+                
+                <div className="h-96 overflow-y-auto p-4 bg-gray-50">
+                  {chatMessages.map((message, index) => (
+                    <div key={index} className={`mb-4 ${message.type === 'user' ? 'text-right' : 'text-left'}`}>
+                      <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
+                        message.type === 'user' 
+                          ? 'bg-purple-600 text-white' 
+                          : 'bg-white text-black border'
+                      }`}>
+                        <p className="text-sm">{message.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <form onSubmit={handleChatSubmit} className="p-4 border-t bg-white">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={currentMessage}
+                      onChange={(e) => setCurrentMessage(e.target.value)}
+                      placeholder="Ask for editing suggestions..."
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                    <button
+                      type="submit"
+                      className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
+                    >
+                      ▶
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }

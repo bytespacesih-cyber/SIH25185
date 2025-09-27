@@ -1,52 +1,82 @@
 import Link from "next/link";
+import { useState } from "react";
 import Navbar from "../components/Navbar";
 import Footer from "../components/Footer";
 
 export default function Home() {
+  const [activeInfoTab, setActiveInfoTab] = useState('whats-new');
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
       
-      {/* Hero Banner Section - Government Style */}
-      <section className="relative bg-gray-50 border-b border-gray-200">
+      {/* Hero Banner Section - Full Banner Display */}
+      <section className="relative bg-gray-50 border-b border-gray-200 h-96 md:h-[500px]">
+        {/* Full Banner Image */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="/images/banner image.jpg" 
+            alt="Government Banner" 
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent"></div>
+        </div>
 
-        <div className="max-w-7xl mx-auto px-4 py-16">
-          <div className="flex flex-col lg:flex-row items-center gap-12">
+        {/* Optional Banner Title Overlay */}
+        <div className="absolute bottom-8 left-8 right-8 z-10">
+          <div className="text-white max-w-2xl">
+            <h1 className="text-2xl md:text-4xl font-bold mb-2 drop-shadow-lg">
+              National Coal Committee for Environmental Research
+            </h1>
+            <p className="text-sm md:text-lg drop-shadow-md">
+              Advanced R&D Proposal Management System
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Content Section - All Elements Below Banner */}
+      <section className="py-12 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-col lg:flex-row items-start gap-12">
             {/* Left Content */}
             <div className="flex-1 text-center lg:text-left">
-              <div className="bg-white p-8 rounded-lg shadow-lg border border-gray-200 mb-8">
+              <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 mb-6">
                 <div className="flex items-center justify-center lg:justify-start gap-4">
-                  <div className="w-24 h-24 bg-white rounded-lg flex items-center justify-center overflow-hidden">
+                  <div className="w-20 h-20 bg-white rounded-lg flex items-center justify-center overflow-hidden shadow-md border">
                     <img 
                       src="/images/prism brand logo.png" 
                       alt="PRISM Logo" 
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-contain p-2"
                     />
                   </div>
                   <div className="text-left">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-1">PRISM</h2>
+                    <h2 className="text-2xl font-bold text-black mb-2">PRISM</h2>
                     <p className="text-sm text-black font-medium">
-                      Proposal Review & Innovation Support Mechanism
+                      Proposal Review & Innovation
+                      Support Mechanism
                     </p>
                   </div>
                 </div>
               </div>
               
-              <h1 className="text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
-                NaCCER Research Portal
-              </h1>
-              <p className="text-lg text-gray-900 mb-8 font-medium">
-                National Coal Committee for Environmental Research - Advanced R&D Proposal Management System
-              </p>
+              <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 mb-8">
+                <h1 className="text-3xl lg:text-4xl font-bold text-black mb-4 leading-tight">
+                  NaCCER Research Portal
+                </h1>
+                <p className="text-lg text-black leading-relaxed">
+                  National Coal Committee for Environmental Research - Advanced R&D Proposal Management System for sustainable coal research and innovation.
+                </p>
+              </div>
               
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link href="/login">
-                  <button className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-3 rounded-md font-medium text-lg transition-colors duration-200">
+                  <button className="bg-orange-600 hover:bg-orange-700 text-white px-8 py-4 rounded-md font-medium text-lg transition-colors duration-200 shadow-md">
                     Sign In to Portal
                   </button>
                 </Link>
                 <Link href="/register">
-                  <button className="border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white px-8 py-3 rounded-md font-medium text-lg transition-colors duration-200">
+                  <button className="border-2 border-orange-600 bg-transparent text-orange-600 hover:bg-orange-600 hover:text-white px-8 py-4 rounded-md font-medium text-lg transition-colors duration-200">
                     Create Account
                   </button>
                 </Link>
@@ -55,53 +85,84 @@ export default function Home() {
 
             {/* Right Content - Info Box */}
             <div className="flex-shrink-0 w-full lg:w-80">
-              <div className="bg-white rounded-lg shadow-lg border border-gray-200">
-                <div className="bg-blue-800 text-white px-4 py-3 rounded-t-lg">
+              <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden">
+                {/* Tab Header */}
+                <div className="bg-indigo-900">
                   <div className="flex">
                     <button 
-                      id="whats-new-tab" 
-                      className="info-tab active bg-blue-900 px-4 py-2 rounded-t-lg text-sm font-medium"
+                      onClick={() => setActiveInfoTab('whats-new')}
+                      className={`flex-1 px-4 py-3 text-sm font-medium transition-all duration-300 ${
+                        activeInfoTab === 'whats-new' 
+                          ? 'bg-indigo-900 text-white' 
+                          : 'text-indigo-200 hover:text-white hover:bg-indigo-800/50'
+                      }`}
                     >
                       What's new
                     </button>
                     <button 
-                      id="important-info-tab" 
-                      className="info-tab px-4 py-2 text-sm text-blue-200 hover:text-white"
+                      onClick={() => setActiveInfoTab('important-info')}
+                      className={`flex-1 px-4 py-3 text-sm font-medium transition-all duration-300 ${
+                        activeInfoTab === 'important-info' 
+                          ? 'bg-indigo-900 text-white' 
+                          : 'text-indigo-200 hover:text-white hover:bg-indigo-800/50'
+                      }`}
                     >
                       Important Information
                     </button>
                   </div>
                 </div>
-                <div className="p-4 space-y-4">
-                  <div id="whats-new-content">
-                    <div className="text-sm">
-                      <p className="text-black mb-1">New R&D proposal guidelines launched</p>
-                      <p className="text-xs text-gray-500">25/09/2025</p>
+                
+                {/* Content Area */}
+                <div className="p-4 bg-gray-50">
+                  {activeInfoTab === 'whats-new' && (
+                    <div className="space-y-3">
+                      <div className="text-sm">
+                        <p className="text-black mb-1">New AI-powered proposal evaluation system launched successfully.</p>
+                        <p className="text-xs text-black">25/09/2025</p>
+                      </div>
+                      
+                      <div className="text-sm">
+                        <p className="text-black mb-1">Enhanced collaboration features now available for all users.</p>
+                        <p className="text-xs text-black">20/09/2025</p>
+                      </div>
+                      
+                      <div className="text-sm">
+                        <p className="text-black mb-1">Updated R&D proposal submission guidelines published.</p>
+                        <p className="text-xs text-black">15/09/2025</p>
+                      </div>
+                      
+                      <div className="text-sm">
+                        <p className="text-black mb-1">Digital transformation initiatives in mining sector expanded.</p>
+                        <p className="text-xs text-black">12/09/2025</p>
+                      </div>
                     </div>
-                    <div className="text-sm">
-                      <p className="text-black mb-1">AI-powered proposal evaluation system now live</p>
-                      <p className="text-xs text-gray-500">20/09/2025</p>
+                  )}
+                  
+                  {activeInfoTab === 'important-info' && (
+                    <div className="space-y-3">
+                      <div className="text-sm">
+                        <p className="text-black mb-1">System maintenance scheduled for Oct 1, 2025</p>
+                        <p className="text-xs text-red-600">Critical Notice</p>
+                      </div>
+                      
+                      <div className="text-sm">
+                        <p className="text-black mb-1">New compliance requirements for research proposals</p>
+                        <p className="text-xs text-blue-600">Policy Update</p>
+                      </div>
+                      
+                      <div className="text-sm">
+                        <p className="text-black mb-1">Deadline extension for pending submissions until Oct 15, 2025</p>
+                        <p className="text-xs text-red-600">Submission Alert</p>
+                      </div>
+                      
+                      <div className="text-sm">
+                        <p className="text-black mb-1">Mandatory training session for new reviewers on Oct 5, 2025</p>
+                        <p className="text-xs text-green-600">Training Notice</p>
+                      </div>
                     </div>
-                    <div className="text-sm">
-                      <p className="text-black mb-1">Enhanced security features implemented</p>
-                      <p className="text-xs text-gray-500">15/09/2025</p>
-                    </div>
-                  </div>
-                  <div id="important-info-content" className="hidden">
-                    <div className="text-sm">
-                      <p className="text-black mb-1">🚨 System maintenance scheduled for Oct 1, 2025</p>
-                      <p className="text-xs text-gray-500">Important Notice</p>
-                    </div>
-                    <div className="text-sm">
-                      <p className="text-black mb-1">📋 New compliance requirements for research proposals</p>
-                      <p className="text-xs text-gray-500">Policy Update</p>
-                    </div>
-                    <div className="text-sm">
-                      <p className="text-black mb-1">⚠️ Deadline extension for pending submissions</p>
-                      <p className="text-xs text-gray-500">Submission Alert</p>
-                    </div>
-                  </div>
-                  <div className="text-center pt-2 border-t border-gray-200">
+                  )}
+                  
+                  <div className="text-center pt-4 border-t border-gray-200 mt-4">
                     <button className="text-blue-600 hover:text-white hover:bg-blue-600 px-4 py-2 rounded transition-colors text-sm font-medium">
                       View All
                     </button>
@@ -111,26 +172,26 @@ export default function Home() {
             </div>
           </div>
         </div>
+      </section>
 
-        {/* Latest Updates Banner */}
-        <div className="bg-amber-400 py-3 overflow-hidden">
-          <div className="max-w-7xl mx-auto px-4">
-            <div className="flex items-center gap-4 text-sm text-gray-800">
-              <span className="font-bold flex items-center gap-2 flex-shrink-0">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                </svg>
-                LATEST
-              </span>
-              <div className="overflow-hidden">
-                <div className="whitespace-nowrap animate-scroll">
-                  New guidelines for R&D proposal submissions effective from October 2025 • Enhanced AI evaluation system launched • Improved collaboration features now available • Coal research initiatives expanded • Digital transformation in mining sector • Sustainable development goals implementation
-                </div>
+      {/* Latest Updates Banner */}
+      <section className="bg-yellow-400 py-3 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center gap-4 text-sm text-black">
+            <span className="font-bold flex items-center gap-2 flex-shrink-0">
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              LATEST
+            </span>
+            <div className="overflow-hidden">
+              <div className="whitespace-nowrap animate-scroll">
+                New guidelines for R&D proposal submissions effective from October 2025 • Enhanced AI evaluation system launched • Improved collaboration features now available • Coal research initiatives expanded • Digital transformation in mining sector • Sustainable development goals implementation
               </div>
             </div>
           </div>
         </div>
-
+        
         <style jsx>{`
           @keyframes scroll {
             0% { transform: translateX(100%); }
@@ -694,29 +755,6 @@ export default function Home() {
         <script dangerouslySetInnerHTML={{
           __html: `
             document.addEventListener('DOMContentLoaded', function() {
-              // Info Box Tabs
-              const infoTabs = document.querySelectorAll('.info-tab');
-              infoTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                  infoTabs.forEach(t => {
-                    t.classList.remove('active', 'bg-blue-900');
-                    t.classList.add('text-blue-200');
-                  });
-                  
-                  this.classList.add('active', 'bg-blue-900');
-                  this.classList.remove('text-blue-200');
-                  
-                  // Show/hide content
-                  if (this.id === 'whats-new-tab') {
-                    document.getElementById('whats-new-content').classList.remove('hidden');
-                    document.getElementById('important-info-content').classList.add('hidden');
-                  } else if (this.id === 'important-info-tab') {
-                    document.getElementById('whats-new-content').classList.add('hidden');
-                    document.getElementById('important-info-content').classList.remove('hidden');
-                  }
-                });
-              });
-
               // Service Tabs
               const serviceTabs = document.querySelectorAll('.service-tab');
               serviceTabs.forEach(tab => {

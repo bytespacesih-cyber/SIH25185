@@ -1,23 +1,179 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableCell } from '@tiptap/extension-table-cell';
+import { TableHeader } from '@tiptap/extension-table-header';
+import { Image } from '@tiptap/extension-image';
+import { Underline } from '@tiptap/extension-underline';
+import { TextAlign } from '@tiptap/extension-text-align';
+import { CharacterCount } from '@tiptap/extension-character-count';
 import { ROLES } from "../../context/AuthContext";
 import ProtectedRoute from "../../components/ProtectedRoute";
 import Navbar from "../../components/Navbar";
 
 function CreateProposalContent() {
   const router = useRouter();
-  const [proposal, setProposal] = useState({
-    title: "",
-    description: "",
-    domain: "",
-    budget: "",
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [chatMessages, setChatMessages] = useState([
+    { type: 'bot', text: 'Hello! I\'m your AI assistant for coal R&D proposal creation. I can help you with technical writing, coal industry compliance, and research methodology suggestions. How can I assist you today?' }
+  ]);
+  const [currentMessage, setCurrentMessage] = useState('');
+  const [wordCount, setWordCount] = useState(0);
+  const [characterCount, setCharacterCount] = useState(0);
+  const [proposalData, setProposalData] = useState({
+    projectTitle: '',
+    implementingAgency: '',
+    projectLeader: '',
+    coInvestigators: '',
+    issueDefinition: '',
+    objectives: '',
+    justification: '',
+    benefits: '',
+    workPlan: '',
+    methodology: '',
+    organization: '',
+    timeSchedule: '',
+    outlayTables: '',
+    figures: ''
   });
 
-  const handleChange = (e) =>
-    setProposal({ ...proposal, [e.target.name]: e.target.value });
+  // Rich text editor configuration
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      CharacterCount,
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      Image.configure({
+        inline: true,
+        allowBase64: true,
+      }),
+    ],
+    content: `
+      <h2 style="color: black;">1. Problem Statement</h2>
+      <p style="color: black;">Describe the coal mining/processing challenge or research gap your project addresses...</p>
+      
+      <h2 style="color: black;">2. Research Objectives</h2>
+      <p style="color: black;">List your primary and secondary research objectives related to coal technology...</p>
+      
+      <h2 style="color: black;">3. Justification & Significance</h2>
+      <p style="color: black;">Explain the importance of this research for the coal sector and mining industry...</p>
+      
+      <h2 style="color: black;">4. Expected Outcomes & Benefits</h2>
+      <p style="color: black;">Describe the anticipated results and their impact on coal production, safety, or efficiency...</p>
+      
+      <h2 style="color: black;">5. Research Methodology</h2>
+      <p style="color: black;">Detail your experimental approach, analytical methods, and technical procedures...</p>
+      
+      <h2 style="color: black;">6. Work Plan & Implementation</h2>
+      <p style="color: black;">Outline project phases, milestones, and implementation strategy...</p>
+      
+      <h2 style="color: black;">7. Budget Breakdown</h2>
+      <p style="color: black;">Insert detailed budget table using the Table button above.</p>
+      
+      <h2 style="color: black;">8. Project Timeline</h2>
+      <p style="color: black;">Provide a comprehensive timeline with key deliverables and milestones...</p>
+    `,
+    immediatelyRender: false,
+    onUpdate: ({ editor }) => {
+      // Update word and character count when content changes
+      if (editor.storage.characterCount) {
+        setWordCount(editor.storage.characterCount.words());
+        setCharacterCount(editor.storage.characterCount.characters());
+      }
+    },
+  });
+
+  // Update counts when editor is ready
+  useEffect(() => {
+    if (editor && editor.storage.characterCount) {
+      setWordCount(editor.storage.characterCount.words());
+      setCharacterCount(editor.storage.characterCount.characters());
+    }
+  }, [editor]);
+
+  const handleChatSubmit = (e) => {
+    e.preventDefault();
+    if (!currentMessage.trim()) return;
+
+    const newMessages = [...chatMessages, { type: 'user', text: currentMessage }];
+    setChatMessages(newMessages);
+
+    // Simulate AI responses with helpful suggestions
+    setTimeout(() => {
+      const aiResponses = [
+        "For coal R&D projects, emphasize the technical innovation and its impact on mining efficiency or safety.",
+        "Include equipment costs, field testing expenses, and coal sample analysis in your budget breakdown.",
+        "Your methodology should detail experimental procedures, coal characterization methods, and safety protocols.",
+        "Consider adding environmental impact assessment and sustainability measures for coal research projects.",
+        "Align your timeline with coal production cycles and include pilot testing phases in mining operations.",
+        "Highlight how your research addresses current challenges in coal extraction, processing, or utilization.",
+        "Include relevant coal industry standards and regulatory compliance requirements in your proposal."
+      ];
+      const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+      setChatMessages(prev => [...prev, { type: 'bot', text: randomResponse }]);
+    }, 1000);
+
+    setCurrentMessage('');
+  };
+
+  const handleDownload = (filename) => {
+    const link = document.createElement('a');
+    link.href = `/files/${filename}`;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleInputChange = (field, value) => {
+    setProposalData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const insertTable = () => {
+    if (editor) {
+      editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+    }
+  };
+
+  const insertImage = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (editor) {
+            editor.chain().focus().setImage({ src: e.target.result }).run();
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    const proposalContent = {
+      ...proposalData,
+      richContent: editor?.getHTML()
+    };
+
     try {
       const token = localStorage.getItem("token");
       const response = await fetch("http://localhost:5000/api/proposals", {
@@ -26,162 +182,426 @@ function CreateProposalContent() {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify(proposal)
+        body: JSON.stringify(proposalContent)
       });
 
       if (response.ok) {
-        alert("Proposal created successfully!");
+        alert("Proposal submitted successfully!");
         router.push("/dashboard");
       } else {
-        alert("Failed to create proposal");
+        alert("Failed to submit proposal");
       }
     } catch (error) {
-      console.error("Error creating proposal:", error);
-      alert("Error creating proposal");
+      console.error("Error submitting proposal:", error);
+      alert("Error submitting proposal");
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
-      <Navbar />
-      
-      {/* Header Section */}
-      <section className="relative bg-gradient-to-br from-slate-900 via-orange-900 to-amber-900 py-16">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-4 right-4 w-32 h-32 bg-orange-400 rounded-full blur-2xl opacity-30 animate-pulse"></div>
-          <div className="absolute bottom-4 left-4 w-24 h-24 bg-amber-400 rounded-full blur-2xl opacity-20 animate-pulse animation-delay-1000"></div>
-        </div>
-        
-        <div className="relative z-10 max-w-7xl mx-auto px-4">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
+      {/* Header Section with Government Branding */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-6">
           <div className="text-center">
-            <div className="inline-flex items-center gap-2 mb-4">
-              <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse"></div>
-              <span className="text-sm font-medium text-orange-200">Research Proposal</span>
-              <div className="w-2 h-2 bg-amber-400 rounded-full animate-pulse animation-delay-500"></div>
-            </div>
-            <h1 className="text-4xl font-bold text-white mb-4 animate-fade-in-up">Create New Proposal</h1>
-            <p className="text-slate-200 text-lg font-light animate-fade-in-up animation-delay-200">Submit your research proposal for evaluation and funding</p>
-            <div className="w-20 h-1 bg-gradient-to-r from-orange-500 to-amber-500 mx-auto mt-6 animate-scale-x"></div>
+            <h1 className="text-4xl font-bold text-blue-900 mb-2">Create R&D Proposal</h1>
+            <p className="text-blue-700 text-lg">PRISM - Proposal Review & Innovation Support Mechanism</p>
+            <p className="text-black mt-2">Submit your R&D proposal for Department of Coal (NaCCER)</p>
           </div>
         </div>
-      </section>
+      </div>
 
-      <main className="max-w-4xl mx-auto px-4 py-12">
-        <form
-          onSubmit={handleSubmit}
-          className="bg-white p-10 rounded-2xl shadow-xl border border-slate-200 animate-fade-in-up animation-delay-400"
-        >
-          <div className="space-y-8">
-            {/* Title Field */}
-            <div className="animate-fade-in-up animation-delay-600">
-              <label className="block text-slate-700 text-sm font-semibold mb-3">
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  Proposal Title
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* AI Assistant Toggle */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <button
+            onClick={() => setShowAIAssistant(!showAIAssistant)}
+            className="bg-purple-600 text-white p-4 rounded-full shadow-lg hover:bg-purple-700 transition-colors"
+            title="AI Assistant"
+          >
+            ⚡
+          </button>
+        </div>
+
+        <div className={`grid gap-8 ${showAIAssistant ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'} transition-all duration-300`}>
+          {/* Main Content Section */}
+          <div className={showAIAssistant ? 'lg:col-span-2' : 'col-span-1'}>
+            {/* Guidelines and Templates Section */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+              <h2 className="text-2xl font-bold text-blue-900 mb-4">■ Guidelines & Templates</h2>
+              <div className="grid md:grid-cols-2 gap-4">
+                <div className="border border-blue-200 rounded-lg p-4 bg-blue-50">
+                  <h3 className="font-semibold text-blue-900 mb-2">S&T Guidelines</h3>
+                  <p className="text-black text-sm mb-3">
+                    Download the complete R&D guidelines for Department of Coal to understand 
+                    the requirements, evaluation criteria, and submission process.
+                  </p>
+                  <button
+                    onClick={() => handleDownload('S&T-Guidelines-MoC.pdf')}
+                    className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    ▣ Download Guidelines (PDF)
+                  </button>
                 </div>
-              </label>
-              <input
-                type="text"
-                name="title"
-                placeholder="Enter a compelling title for your research proposal"
-                value={proposal.title}
-                onChange={handleChange}
-                className="w-full p-4 border border-slate-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none text-slate-900 bg-white font-medium transition-all duration-300 hover:border-slate-400"
-                required
-              />
-            </div>
-
-            {/* Description Field */}
-            <div className="animate-fade-in-up animation-delay-700">
-              <label className="block text-slate-700 text-sm font-semibold mb-3">
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
-                  </svg>
-                  Detailed Description
+                
+                <div className="border border-green-200 rounded-lg p-4 bg-green-50">
+                  <h3 className="font-semibold text-green-900 mb-2">Proposal Template</h3>
+                  <p className="text-black text-sm mb-3">
+                    Use our standardized template to structure your R&D proposal correctly. 
+                    This template ensures all required sections for coal research are included.
+                  </p>
+                  <button
+                    onClick={() => handleDownload('proposal-template.docx')}
+                    className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center justify-center gap-2"
+                  >
+                    ▤ Download Template (DOC)
+                  </button>
                 </div>
-              </label>
-              <textarea
-                name="description"
-                placeholder="Provide a comprehensive description of your research proposal, including objectives, methodology, and expected outcomes..."
-                value={proposal.description}
-                onChange={handleChange}
-                rows="6"
-                className="w-full p-4 border border-slate-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none text-slate-900 bg-white font-medium transition-all duration-300 hover:border-slate-400 resize-none"
-                required
-              />
+              </div>
             </div>
 
-            {/* Domain Field */}
-            <div className="animate-fade-in-up animation-delay-800">
-              <label className="block text-slate-700 text-sm font-semibold mb-3">
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                  </svg>
-                  Research Domain
+            {/* Proposal Form Section */}
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Basic Information */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <h2 className="text-2xl font-bold text-blue-900 mb-6">� Proposal Information</h2>
+                
+                <div className="grid md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-black mb-2">Project Title *</label>
+                    <input
+                      type="text"
+                      value={proposalData.projectTitle}
+                      onChange={(e) => handleInputChange('projectTitle', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Enter your project title"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-black mb-2">Implementing Agency *</label>
+                    <input
+                      type="text"
+                      value={proposalData.implementingAgency}
+                      onChange={(e) => handleInputChange('implementingAgency', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Name of implementing organization"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-black mb-2">Project Leader *</label>
+                    <input
+                      type="text"
+                      value={proposalData.projectLeader}
+                      onChange={(e) => handleInputChange('projectLeader', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Principal investigator name"
+                      required
+                    />
+                  </div>
+                  
+                  <div>
+                    <label className="block text-sm font-semibold text-black mb-2">Co-investigator(s)</label>
+                    <input
+                      type="text"
+                      value={proposalData.coInvestigators}
+                      onChange={(e) => handleInputChange('coInvestigators', e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder="Names of co-investigators"
+                    />
+                  </div>
                 </div>
-              </label>
-              <input
-                type="text"
-                name="domain"
-                placeholder="e.g., Artificial Intelligence, Healthcare Technology, Renewable Energy, Biotechnology"
-                value={proposal.domain}
-                onChange={handleChange}
-                className="w-full p-4 border border-slate-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none text-slate-900 bg-white font-medium transition-all duration-300 hover:border-slate-400"
-                required
-              />
-            </div>
+              </div>
 
-            {/* Budget Field */}
-            <div className="animate-fade-in-up animation-delay-900">
-              <label className="block text-slate-700 text-sm font-semibold mb-3">
-                <div className="flex items-center gap-2">
-                  <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Proposed Budget (INR)
+              {/* Rich Text Editor Section */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <div className="mb-4">
+                  <h2 className="text-2xl font-bold text-blue-900 mb-4">▤ Proposal Content</h2>
+                  
+                  {/* Formatting Toolbar - Two organized rows */}
+                  <div className="border border-gray-200 rounded-md p-3 mb-4 bg-gray-50">
+                    {/* First Row - Basic Formatting */}
+                    <div className="flex gap-1 items-center mb-2">
+                      {/* Text Formatting */}
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().toggleBold().run()}
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          editor?.isActive('bold') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                        }`}
+                        title="Bold (Ctrl+B)"
+                      >
+                        <strong>B</strong>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().toggleItalic().run()}
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          editor?.isActive('italic') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                        }`}
+                        title="Italic (Ctrl+I)"
+                      >
+                        <em>I</em>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().toggleUnderline?.().run()}
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          editor?.isActive('underline') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                        }`}
+                        title="Underline (Ctrl+U)"
+                      >
+                        <u>U</u>
+                      </button>
+                      
+                      <div className="w-px bg-gray-300 mx-2 h-6"></div>
+                      
+                      {/* Headings */}
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().toggleHeading({ level: 1 }).run()}
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          editor?.isActive('heading', { level: 1 }) ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                        }`}
+                        title="Heading 1"
+                      >
+                        H1
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          editor?.isActive('heading', { level: 2 }) ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                        }`}
+                        title="Heading 2"
+                      >
+                        H2
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().setParagraph().run()}
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          editor?.isActive('paragraph') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                        }`}
+                        title="Normal Text"
+                      >
+                        P
+                      </button>
+                      
+                      <div className="w-px bg-gray-300 mx-2 h-6"></div>
+                      
+                      {/* Lists */}
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          editor?.isActive('bulletList') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                        }`}
+                        title="Bullet List"
+                      >
+                        • List
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().toggleOrderedList().run()}
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          editor?.isActive('orderedList') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                        }`}
+                        title="Numbered List"
+                      >
+                        1. List
+                      </button>
+                    </div>
+                    
+                    {/* Second Row - Alignment and Actions */}
+                    <div className="flex gap-1 items-center">
+                      {/* Alignment */}
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().setTextAlign('left').run()}
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          editor?.isActive({ textAlign: 'left' }) ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                        }`}
+                        title="Align Left"
+                      >
+                        ⬅
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().setTextAlign('center').run()}
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          editor?.isActive({ textAlign: 'center' }) ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                        }`}
+                        title="Center"
+                      >
+                        ↔
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().setTextAlign('right').run()}
+                        className={`px-3 py-2 rounded text-sm transition-colors ${
+                          editor?.isActive({ textAlign: 'right' }) ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                        }`}
+                        title="Align Right"
+                      >
+                        ➡
+                      </button>
+                      
+                      <div className="w-px bg-gray-300 mx-2 h-6"></div>
+                      
+                      {/* Actions */}
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().undo().run()}
+                        className="bg-black text-white px-3 py-2 rounded text-sm hover:bg-gray-800"
+                        title="Undo (Ctrl+Z)"
+                      >
+                        ↶
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().redo().run()}
+                        className="bg-black text-white px-3 py-2 rounded text-sm hover:bg-gray-800"
+                        title="Redo (Ctrl+Y)"
+                      >
+                        ↷
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().unsetAllMarks().clearNodes().run()}
+                        className="bg-black text-white px-3 py-2 rounded text-sm hover:bg-gray-800"
+                        title="Clear Formatting"
+                      >
+                        Clear
+                      </button>
+                      
+                      <div className="w-px bg-gray-300 mx-2 h-6"></div>
+                      
+                      {/* Insert Options */}
+                      <button
+                        type="button"
+                        onClick={insertTable}
+                        className="bg-black text-white px-3 py-2 rounded text-sm hover:bg-gray-800"
+                        title="Insert Table"
+                      >
+                        ▦ Table
+                      </button>
+                      <button
+                        type="button"
+                        onClick={insertImage}
+                        className="bg-black text-white px-3 py-2 rounded text-sm hover:bg-gray-800"
+                        title="Insert Image"
+                      >
+                        ▣ Image
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => editor?.chain().focus().setHorizontalRule().run()}
+                        className="bg-black text-white px-3 py-2 rounded text-sm hover:bg-gray-800"
+                        title="Insert Horizontal Line"
+                      >
+                        ─ Line
+                      </button>
+                    </div>
+                  </div>
                 </div>
-              </label>
-              <input
-                type="number"
-                name="budget"
-                placeholder="Enter budget amount in Indian Rupees"
-                value={proposal.budget}
-                onChange={handleChange}
-                className="w-full p-4 border border-slate-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none text-slate-900 bg-white font-medium transition-all duration-300 hover:border-slate-400"
-                required
-              />
-            </div>
+                
+                <div className="prose max-w-none">
+                  <div className="border border-gray-300 rounded-md min-h-[500px] p-6 bg-white">
+                    <EditorContent 
+                      editor={editor} 
+                      className="focus:outline-none min-h-[450px] text-black"
+                      style={{ color: 'black' }}
+                    />
+                  </div>
+                </div>
+                
+                <div className="flex justify-between items-center mt-4 pt-3 border-t border-gray-200">
+                  <div className="text-sm text-black">
+                    <strong>Word Count: {wordCount} words</strong>
+                  </div>
+                  <div className="text-sm text-black">
+                    <strong>Characters: {characterCount}</strong>
+                  </div>
+                </div>
+                
+                <div className="mt-4 text-sm text-black">
+                  <p className="mb-2"><strong>Required sections for Coal R&D proposals:</strong></p>
+                  <ul className="list-disc list-inside space-y-1 text-black">
+                    <li>Problem Statement (coal mining/processing challenges)</li>
+                    <li>Research Objectives (technical goals and targets)</li>
+                    <li>Justification & Significance (impact on coal sector)</li>
+                    <li>Expected Outcomes (technological improvements)</li>
+                    <li>Research Methodology (experimental procedures)</li>
+                    <li>Work Plan & Implementation Strategy</li>
+                    <li>Project Timeline with Key Milestones</li>
+                    <li>Detailed Budget Breakdown</li>
+                    <li>Technical Figures, Charts, and Data</li>
+                  </ul>
+                </div>
+              </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-6 pt-6 animate-fade-in-up animation-delay-1000">
-              <button
-                type="submit"
-                className="flex-1 group bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white py-4 px-8 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3"
-              >
-                <svg className="w-6 h-6 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Create Proposal
-              </button>
-              <button
-                type="button"
-                onClick={() => router.push("/dashboard")}
-                className="flex-1 group bg-slate-500 hover:bg-slate-600 text-white py-4 px-8 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center justify-center gap-3"
-              >
-                <svg className="w-6 h-6 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Cancel
-              </button>
-            </div>
+              {/* Submit Button */}
+              <div className="bg-white rounded-lg shadow-md p-6">
+                <button
+                  type="submit"
+                  className="w-full bg-blue-600 text-white py-4 px-8 rounded-md text-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+                >
+                  ▶ Submit R&D Proposal
+                </button>
+              </div>
+            </form>
           </div>
-        </form>
-      </main>
+
+          {/* AI Assistant Sidebar */}
+          {showAIAssistant && (
+            <div className="lg:col-span-1">
+              <div className="bg-white rounded-lg shadow-md overflow-hidden sticky top-4">
+                <div className="bg-purple-600 text-white p-4">
+                  <h3 className="font-semibold flex items-center gap-2">
+                    ⚡ AI Writing Assistant
+                  </h3>
+                  <p className="text-purple-100 text-sm">Get help with drafting, suggestions & compliance</p>
+                </div>
+                
+                <div className="h-96 overflow-y-auto p-4 bg-gray-50">
+                  {chatMessages.map((message, index) => (
+                    <div key={index} className={`mb-4 ${message.type === 'user' ? 'text-right' : 'text-left'}`}>
+                      <div className={`inline-block max-w-[80%] p-3 rounded-lg ${
+                        message.type === 'user' 
+                          ? 'bg-purple-600 text-white' 
+                          : 'bg-white text-black border'
+                      }`}>
+                        <p className="text-sm">{message.text}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                
+                <form onSubmit={handleChatSubmit} className="p-4 border-t bg-white">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={currentMessage}
+                      onChange={(e) => setCurrentMessage(e.target.value)}
+                      placeholder="Ask for writing help..."
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    />
+                    <button
+                      type="submit"
+                      className="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors"
+                    >
+                      ▶
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
