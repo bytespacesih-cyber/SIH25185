@@ -1,5 +1,15 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import { Table } from '@tiptap/extension-table';
+import { TableRow } from '@tiptap/extension-table-row';
+import { TableCell } from '@tiptap/extension-table-cell';
+import { TableHeader } from '@tiptap/extension-table-header';
+import { Image } from '@tiptap/extension-image';
+import { Underline } from '@tiptap/extension-underline';
+import { TextAlign } from '@tiptap/extension-text-align';
+import { CharacterCount } from '@tiptap/extension-character-count';
 import { useAuth, ROLES } from "../../../context/AuthContext";
 import ProtectedRoute from "../../../components/ProtectedRoute";
 
@@ -14,49 +24,264 @@ function CollaborateContent() {
   const [report, setReport] = useState("");
   const [feedback, setFeedback] = useState("");
   const [messageCount, setMessageCount] = useState(0);
+  const [showVersionHistory, setShowVersionHistory] = useState(false);
+  const [showCommunication, setShowCommunication] = useState(false);
+  const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [wordCount, setWordCount] = useState(0);
+  const [characterCount, setCharacterCount] = useState(0);
+  const [chatMessages, setChatMessages] = useState([
+    { type: 'bot', text: 'Hello! I\'m your AI collaboration assistant. I can help analyze the proposal, suggest improvements, and facilitate better teamwork. What would you like to focus on?' }
+  ]);
+  const [currentMessage, setCurrentMessage] = useState('');
+  
+  // Inline comments and AI suggestions
+  const [inlineComments] = useState([
+    {
+      id: 1,
+      type: 'comment',
+      author: 'Prof. Michael Chen',
+      role: 'reviewer',
+      text: 'The problem statement is well-defined, but consider adding more quantitative data to support the 35-40% efficiency claim.',
+      position: { line: 3, character: 150 },
+      timestamp: '2025-09-25 14:30'
+    },
+    {
+      id: 2,
+      type: 'ai_suggestion',
+      category: 'Budget',
+      text: 'Consider reducing equipment costs by 15% and allocating funds to contract workers for specialized tasks. This could reduce timeline by 3 months.',
+      confidence: 85,
+      position: { line: 12, character: 200 },
+      timestamp: '2025-09-26 09:15'
+    },
+    {
+      id: 3,
+      type: 'comment',
+      author: 'Dr. Sarah Kumar',
+      role: 'staff',
+      text: 'The methodology looks comprehensive. Have you considered collaboration with CSIR-CIMFR for coal characterization studies?',
+      position: { line: 18, character: 100 },
+      timestamp: '2025-09-25 16:45'
+    },
+    {
+      id: 4,
+      type: 'ai_suggestion',
+      category: 'Feasibility',
+      text: 'Timeline appears optimistic. Based on similar projects, consider adding 20% buffer time for regulatory approvals and equipment installation.',
+      confidence: 78,
+      position: { line: 25, character: 75 },
+      timestamp: '2025-09-26 10:20'
+    }
+  ]);
+  
+  // Version history dummy data
+  const [versionHistory] = useState([
+    {
+      id: 1,
+      version: "2.3",
+      date: "2025-09-26",
+      time: "10:45",
+      author: "Dr. Raj Patel",
+      changes: "Incorporated reviewer feedback on gasification methodology and added carbon capture efficiency metrics",
+      collaborators: ["Prof. Michael Chen", "Dr. Sarah Kumar"],
+      status: "current",
+      timestamp: "Sep 26, 10:45 AM"
+    },
+    {
+      id: 2,
+      version: "2.2", 
+      date: "2025-09-25",
+      time: "16:30",
+      author: "Prof. Michael Chen",
+      changes: "Added budget optimization suggestions and updated equipment cost estimates",
+      collaborators: ["Dr. Raj Patel"],
+      status: "saved",
+      timestamp: "Sep 25, 4:30 PM"
+    },
+    {
+      id: 3,
+      version: "2.1",
+      date: "2025-09-25",
+      time: "14:15",
+      author: "Dr. Sarah Kumar",
+      changes: "Updated project timeline based on feasibility analysis and regulatory requirements",
+      collaborators: ["Dr. Raj Patel", "Prof. Michael Chen"],
+      status: "saved",
+      timestamp: "Sep 25, 2:15 PM"
+    },
+    {
+      id: 4,
+      version: "2.0",
+      date: "2025-09-24",
+      time: "11:20",
+      author: "Dr. Raj Patel",
+      changes: "Initial collaborative version with integrated coal gasification design and environmental impact assessment",
+      collaborators: [],
+      status: "saved",
+      timestamp: "Sep 24, 11:20 AM"
+    }
+  ]);
 
   // Sample proposal data
   const sampleProposal = {
     id: id || 1,
-    title: "AI-Powered Healthcare Diagnostics System",
+    title: "Advanced Coal Gasification Technology for Enhanced Energy Production",
     author: "Dr. Raj Patel",
-    status: "under_review",
-    description: "Development of an advanced AI system for early disease detection and diagnosis in rural healthcare settings using machine learning and computer vision technologies.",
-    createdAt: "2024-01-15T10:30:00Z",
-    domain: "Artificial Intelligence & Healthcare",
-    budget: 2500000,
+    status: "under_collaborative_review",
+    description: "Development of an innovative coal gasification system achieving 60%+ energy efficiency with integrated carbon capture mechanisms for sustainable coal utilization in power generation and industrial applications.",
+    createdAt: "2025-09-20T10:30:00Z",
+    domain: "Coal Technology & Energy Systems",
+    budget: 20000000,
     assignedStaff: "Dr. Sarah Kumar",
     reviewer: "Prof. Michael Chen",
-    tags: ["AI", "Healthcare", "Machine Learning", "Rural Medicine"]
+    tags: ["Coal Gasification", "Energy Efficiency", "Carbon Capture", "Sustainable Mining"],
+    collaborators: [
+      { name: "Dr. Raj Patel", role: "Principal Investigator", status: "online" },
+      { name: "Prof. Michael Chen", role: "Technical Reviewer", status: "online" },
+      { name: "Dr. Sarah Kumar", role: "Research Coordinator", status: "away" },
+      { name: "Dr. Priya Sharma", role: "Environmental Specialist", status: "offline" }
+    ]
   };
 
-  // Sample messages
+  // Sample messages for sidebar chat
   const sampleMessages = [
     {
       id: 1,
       sender: "Dr. Raj Patel",
       role: "user",
-      message: "Hello everyone! I'm excited to collaborate on this healthcare AI project. Looking forward to your insights.",
-      timestamp: "2024-01-15T11:00:00Z",
-      type: "message"
+      message: "Hello everyone! I'm excited to collaborate on this coal gasification project. Looking forward to your insights on the technical approach.",
+      timestamp: "2025-09-25T11:00:00Z",
+      type: "message",
+      time: "11:00 AM",
+      content: "Hello everyone! I'm excited to collaborate on this coal gasification project. Looking forward to your insights on the technical approach."
     },
     {
       id: 2,
       sender: "Dr. Sarah Kumar",
       role: "staff",
-      message: "Welcome to the collaboration space! I've reviewed the initial proposal and it looks very promising. I have some questions about the data collection methodology.",
-      timestamp: "2024-01-15T14:30:00Z",
-      type: "report"
+      message: "Welcome to the collaboration space! I've reviewed the initial proposal and the gasification efficiency targets look achievable. I have some questions about the carbon capture integration.",
+      timestamp: "2025-09-25T14:30:00Z",
+      type: "report",
+      time: "2:30 PM",
+      content: "Welcome to the collaboration space! I've reviewed the initial proposal and the gasification efficiency targets look achievable. I have some questions about the carbon capture integration."
     },
     {
       id: 3,
       sender: "Prof. Michael Chen",
       role: "reviewer",
-      message: "This is an innovative approach to rural healthcare challenges. I'd like to discuss the scalability aspects and potential regulatory considerations.",
-      timestamp: "2024-01-16T09:15:00Z",
-      type: "feedback"
+      message: "This is an innovative approach to coal utilization. I'd like to discuss the reactor design specifications and potential scale-up challenges for industrial implementation.",
+      timestamp: "2025-09-25T16:15:00Z",
+      type: "feedback",
+      time: "4:15 PM",
+      content: "This is an innovative approach to coal utilization. I'd like to discuss the reactor design specifications and potential scale-up challenges for industrial implementation."
+    },
+    {
+      id: 4,
+      sender: "AI Assistant",
+      role: "ai",
+      message: "I've analyzed the budget allocation and suggest optimizing the equipment costs. Consider exploring partnerships with BHEL for gasification reactor components to reduce expenses by 12-15%.",
+      timestamp: "2025-09-26T09:20:00Z",
+      type: "ai_suggestion",
+      time: "9:20 AM",
+      content: "I've analyzed the budget allocation and suggest optimizing the equipment costs. Consider exploring partnerships with BHEL for gasification reactor components to reduce expenses by 12-15%."
     }
   ];
+
+  // Rich text editor configuration
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Underline,
+      TextAlign.configure({
+        types: ['heading', 'paragraph'],
+      }),
+      CharacterCount,
+      Table.configure({
+        resizable: true,
+      }),
+      TableRow,
+      TableHeader,
+      TableCell,
+      Image.configure({
+        inline: true,
+        allowBase64: true,
+      }),
+    ],
+    content: `
+      <h1 style="color: black; text-align: center;">Advanced Coal Gasification Technology for Enhanced Energy Production</h1>
+      
+      <h2 style="color: black;">1. Problem Statement</h2>
+      <p style="color: black;">The coal sector faces significant challenges in optimizing energy extraction while minimizing environmental impact. Traditional coal combustion methods result in only 35-40% energy efficiency, with substantial CO2 emissions and particulate matter release. There is an urgent need for innovative gasification technologies that can improve energy output to 60-65% efficiency while reducing harmful emissions by 40-50%.</p>
+      
+      <p style="color: black;">Current coal processing facilities in India operate with outdated equipment that struggles to meet environmental compliance standards set by the Ministry of Coal. The lack of advanced gasification infrastructure limits the country's ability to maximize coal utilization for power generation and industrial applications.</p>
+      
+      <h2 style="color: black;">2. Research Objectives</h2>
+      <p style="color: black;"><strong>Primary Objectives:</strong></p>
+      <ul style="color: black;">
+        <li>Develop an integrated coal gasification system achieving 60%+ energy efficiency</li>
+        <li>Design carbon capture mechanisms reducing CO2 emissions by 45%</li>
+        <li>Create automated monitoring systems for real-time process optimization</li>
+        <li>Establish economic viability models for large-scale implementation</li>
+      </ul>
+      
+      <h2 style="color: black;">3. Research Methodology</h2>
+      <p style="color: black;"><strong>Phase 1: Laboratory Testing (Months 1-8)</strong></p>
+      <ul style="color: black;">
+        <li>Coal characterization using X-ray fluorescence and thermogravimetric analysis</li>
+        <li>Gasification reactor design using computational fluid dynamics modeling</li>
+        <li>Catalyst development for enhanced reaction efficiency</li>
+        <li>Small-scale prototype testing under controlled conditions</li>
+      </ul>
+      
+      <h2 style="color: black;">4. Budget Breakdown</h2>
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
+        <thead>
+          <tr style="background-color: #f3f4f6;">
+            <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left; color: black;">Category</th>
+            <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left; color: black;">Amount (₹ Cr)</th>
+            <th style="border: 1px solid #d1d5db; padding: 12px; text-align: left; color: black;">Percentage</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">Equipment & Infrastructure</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">120</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">60%</td>
+          </tr>
+          <tr>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">Personnel & Consulting</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">50</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">25%</td>
+          </tr>
+          <tr style="background-color: #f9fafb; font-weight: bold;">
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">Total Project Cost</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">200</td>
+            <td style="border: 1px solid #d1d5db; padding: 12px; color: black;">100%</td>
+          </tr>
+        </tbody>
+      </table>
+      
+      <h2 style="color: black;">5. Project Timeline</h2>
+      <p style="color: black;"><strong>Year 1 (Months 1-12):</strong> Laboratory testing and reactor design optimization</p>
+      <p style="color: black;"><strong>Year 2 (Months 13-24):</strong> Pilot plant construction, testing, and field validation</p>
+    `,
+    editable: true,
+    immediatelyRender: false,
+    onUpdate: ({ editor }) => {
+      if (editor.storage.characterCount) {
+        setWordCount(editor.storage.characterCount.words());
+        setCharacterCount(editor.storage.characterCount.characters());
+      }
+    },
+  });
+
+  // Update counts when editor is ready
+  useEffect(() => {
+    if (editor && editor.storage.characterCount) {
+      setWordCount(editor.storage.characterCount.words());
+      setCharacterCount(editor.storage.characterCount.characters());
+    }
+  }, [editor]);
 
   useEffect(() => {
     if (id) {
@@ -64,6 +289,82 @@ function CollaborateContent() {
       fetchMessages();
     }
   }, [id]);
+
+  const handleChatSubmit = (messageText) => {
+    if (!messageText.trim()) return;
+
+    const newMsg = {
+      id: Date.now(),
+      sender: user?.name || 'Current User',
+      role: user?.role || 'user',
+      message: messageText,
+      timestamp: new Date().toISOString(),
+      type: 'message',
+      time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+      content: messageText
+    };
+
+    const updatedMessages = [...messages, newMsg];
+    setMessages(updatedMessages);
+    setMessageCount(updatedMessages.length);
+
+    // Simulate AI responses for collaboration assistance
+    setTimeout(() => {
+      const aiResponses = [
+        "Based on the document analysis, I suggest focusing on the budget optimization in section 4. The equipment costs seem high compared to similar projects.",
+        "The timeline in section 5 appears ambitious. Consider adding buffer time for regulatory approvals and equipment procurement.",
+        "For improved feasibility, I recommend partnering with contract specialists for the gasification reactor design phase.",
+        "The methodology is solid, but adding environmental impact metrics would strengthen the proposal significantly.",
+        "Consider highlighting the economic benefits more prominently - job creation estimates would be valuable.",
+        "The carbon capture mechanism needs more technical details for reviewer confidence.",
+        "Suggest adding risk mitigation strategies for potential technical challenges in the gasification process."
+      ];
+      const randomResponse = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+      
+      const aiMsg = {
+        id: Date.now() + 1,
+        sender: 'AI Assistant',
+        role: 'ai',
+        message: randomResponse,
+        timestamp: new Date().toISOString(),
+        type: 'ai_suggestion',
+        time: new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' }),
+        content: randomResponse
+      };
+      
+      setMessages(prev => [...prev, aiMsg]);
+      setMessageCount(prev => prev + 1);
+    }, 1500);
+  };
+
+  const insertTable = () => {
+    if (editor) {
+      editor.chain().focus().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run();
+    }
+  };
+
+  const insertImage = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          if (editor) {
+            editor.chain().focus().setImage({ src: e.target.result }).run();
+          }
+        };
+        reader.readAsDataURL(file);
+      }
+    };
+    input.click();
+  };
+
+  const addInlineComment = () => {
+    alert('Click on text to add inline comments (Demo feature)');
+  };
 
   const fetchProposal = async () => {
     try {
@@ -198,403 +499,380 @@ function CollaborateContent() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-slate-100 to-green-50">
-      {/* Hero Section */}
-      <div className="relative bg-gradient-to-br from-green-600 via-green-700 to-emerald-800 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-black/20"></div>
-        <div className="absolute inset-0 bg-gradient-to-r from-green-600/90 via-transparent to-emerald-800/90"></div>
-        
-        {/* Animated Background Elements */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-white/10 rounded-full animate-float"></div>
-          <div className="absolute top-40 -left-20 w-60 h-60 bg-emerald-300/10 rounded-full animate-float animation-delay-1000"></div>
-          <div className="absolute -bottom-20 right-20 w-40 h-40 bg-green-300/10 rounded-full animate-float animation-delay-2000"></div>
-        </div>
-
-        <nav className="relative z-10 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex justify-between items-center h-16">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                  </svg>
-                </div>
-                <span className="text-xl font-bold">ByteSpace</span>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-white">
+      {/* Header Section */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-blue-900 mb-1">Collaborative Research Space</h1>
+              <p className="text-blue-700">PRISM - Proposal Review & Innovation Support Mechanism</p>
+              <div className="flex items-center gap-4 mt-2 text-sm text-black">
+                <span>Proposal ID: #{id}</span>
+                <span>•</span>
+                <span>Collaborative Editing Active</span>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  {proposal?.collaborators?.filter(c => c.status === 'online').length || 2} collaborators online
+                </span>
               </div>
-              <button 
-                onClick={() => router.push('/dashboard')}
-                className="bg-white/20 hover:bg-white/30 px-4 py-2 rounded-lg backdrop-blur-sm transition-all duration-300 font-semibold"
+            </div>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setShowVersionHistory(!showVersionHistory)}
+                className="bg-gray-100 hover:bg-gray-200 text-black px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+                title="Version History"
               >
-                Back to Dashboard
+                ◷ History
+              </button>
+              <button
+                onClick={() => setShowCommunication(!showCommunication)}
+                className="bg-blue-100 hover:bg-blue-200 text-blue-800 px-4 py-2 rounded-lg transition-colors flex items-center gap-2"
+                title="Communication"
+              >
+                ◌ Chat
+              </button>
+              <button
+                onClick={() => router.push('/dashboard')}
+                className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
+              >
+                ← Back
               </button>
             </div>
-          </div>
-        </nav>
-
-        <div className="relative z-10 py-20 px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 animate-fade-in-up">
-              Collaborative 
-              <span className="block bg-gradient-to-r from-emerald-300 to-green-300 bg-clip-text text-transparent">
-                Research Space
-              </span>
-            </h1>
-            <p className="text-xl text-green-100 max-w-3xl mx-auto leading-relaxed animate-fade-in-up animation-delay-200">
-              Connect, discuss, and collaborate with researchers and experts in real-time
-            </p>
           </div>
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Proposal Header Card */}
-        <div className="bg-white p-8 rounded-2xl shadow-xl border border-slate-200 mb-8 animate-fade-in-up animation-delay-400">
-          <div className="flex items-start justify-between mb-6">
-            <div className="flex-1">
-              <h2 className="text-3xl font-bold text-slate-900 mb-3 group-hover:text-green-600 transition-colors duration-300">
-                {proposal.title}
-              </h2>
-              <p className="text-slate-600 text-lg">Proposal ID: #{proposal.id}</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <span className="inline-flex px-4 py-2 rounded-full text-sm font-bold bg-gradient-to-r from-green-500 to-emerald-600 text-white">
-                Collaboration Active
-              </span>
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-6 mb-6">
-            <div className="p-4 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-                <p className="text-slate-600 font-medium">Author</p>
-              </div>
-              <p className="text-slate-900 font-bold text-lg">{proposal.author}</p>
-            </div>
-            
-            <div className="p-4 bg-gradient-to-br from-green-50 to-emerald-50 rounded-xl border border-green-200">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                  </svg>
-                </div>
-                <p className="text-green-600 font-medium">Domain</p>
-              </div>
-              <p className="text-green-800 font-bold text-lg">{proposal.domain}</p>
-            </div>
-            
-            <div className="p-4 bg-gradient-to-br from-orange-50 to-red-50 rounded-xl border border-orange-200">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
-                <p className="text-orange-600 font-medium">Status</p>
-              </div>
-              <span className="inline-flex px-3 py-1 rounded-full text-sm font-bold bg-gradient-to-r from-orange-500 to-red-600 text-white">
-                {proposal.status?.replace('_', ' ')?.toUpperCase()}
-              </span>
-            </div>
-          </div>
-
-          <div className="p-6 bg-gradient-to-br from-slate-50 to-slate-100 rounded-xl border border-slate-200">
-            <h3 className="text-lg font-bold text-slate-900 mb-3 flex items-center gap-2">
-              <svg className="w-5 h-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              Project Description
-            </h3>
-            <p className="text-slate-700 leading-relaxed">{proposal.description}</p>
-          </div>
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        {/* AI Assistant Toggle */}
+        <div className="fixed bottom-6 right-6 z-50">
+          <button
+            onClick={() => setShowAIAssistant(!showAIAssistant)}
+            className="bg-purple-600 text-white p-4 rounded-full shadow-lg hover:bg-purple-700 transition-colors"
+            title="AI Collaboration Assistant"
+          >
+            ⚡
+          </button>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Messages/Communication Panel */}
-          <div className="lg:col-span-2 bg-gradient-to-br from-white via-green-50/30 to-emerald-50/20 rounded-2xl shadow-xl border border-green-200/50 overflow-hidden">
-            <div className="p-6 border-b border-green-200/70 bg-gradient-to-r from-green-500 to-emerald-600">
-              <div className="flex items-center gap-3 mb-2">
-                <div className="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-white">Communication Thread</h3>
-                  <p className="text-green-100 font-medium">Real-time collaboration between all stakeholders</p>
+        <div className={`grid gap-8 ${showVersionHistory || showCommunication || showAIAssistant ? 'grid-cols-1 lg:grid-cols-3' : 'grid-cols-1'} transition-all duration-300`}>
+          {/* Main Content Section - Collaborative Editor */}
+          <div className={showVersionHistory || showCommunication || showAIAssistant ? 'lg:col-span-2' : 'col-span-1'}>
+            {/* Proposal Header */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex-1">
+                  <h2 className="text-2xl font-bold text-blue-900 mb-2">{proposal.title}</h2>
+                  <div className="flex items-center gap-4 text-sm text-black">
+                    <span>Author: <strong>{proposal.author}</strong></span>
+                    <span>•</span>
+                    <span>Domain: <strong>{proposal.domain}</strong></span>
+                    <span>•</span>
+                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${
+                      proposal.status === 'under_collaborative_review' 
+                        ? 'bg-blue-100 text-blue-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}>
+                      {proposal.status?.replace('_', ' ').toUpperCase()}
+                    </span>
+                  </div>
                 </div>
               </div>
-            </div>
-            
-            {/* Messages Display */}
-            <div className="p-6 max-h-96 overflow-y-auto messages-container bg-gradient-to-b from-green-50/30 to-emerald-50/20">
-              {messages.length === 0 ? (
-                <div className="text-center py-12">
-                  <div className="w-16 h-16 bg-gradient-to-br from-green-100 to-emerald-100 rounded-2xl flex items-center justify-center mb-4 mx-auto">
-                    <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                  </div>
-                  <p className="text-green-700 font-semibold text-lg">No messages yet</p>
-                  <p className="text-green-600 mt-1">Start the conversation to collaborate effectively!</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  <div className="text-center">
-                    <div className="inline-flex items-center gap-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white px-4 py-2 rounded-full text-sm font-semibold">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                      </svg>
-                      {messages.length} message{messages.length !== 1 ? 's' : ''} in conversation
+              
+              {/* Active Collaborators */}
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-sm font-semibold text-black">Active Collaborators:</span>
+                {proposal.collaborators?.map((collaborator, index) => (
+                  <div key={index} className="flex items-center gap-2">
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${
+                      collaborator.role === 'Principal Investigator' ? 'bg-blue-600' :
+                      collaborator.role === 'Technical Reviewer' ? 'bg-purple-600' :
+                      collaborator.role === 'Research Coordinator' ? 'bg-green-600' :
+                      'bg-gray-600'
+                    }`}>
+                      {collaborator.name.charAt(0)}
+                    </div>
+                    <div className="text-xs">
+                      <div className="font-semibold text-black">{collaborator.name}</div>
+                      <div className={`flex items-center gap-1 ${
+                        collaborator.status === 'online' ? 'text-green-600' :
+                        collaborator.status === 'away' ? 'text-yellow-600' : 'text-gray-400'
+                      }`}>
+                        <div className={`w-2 h-2 rounded-full ${
+                          collaborator.status === 'online' ? 'bg-green-500' :
+                          collaborator.status === 'away' ? 'bg-yellow-500' : 'bg-gray-400'
+                        }`}></div>
+                        {collaborator.status}
+                      </div>
                     </div>
                   </div>
-                  {messages.map((msg, index) => (
-                    <div key={msg.id} className={`p-4 rounded-xl border-l-4 transition-all duration-500 hover:shadow-lg animate-fade-in-up ${
-                      msg.role === 'reviewer' ? 'bg-gradient-to-br from-purple-50 to-violet-50 border-l-purple-500 hover:from-purple-100 hover:to-violet-100' :
-                      msg.role === 'staff' ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-l-green-500 hover:from-green-100 hover:to-emerald-100' :
-                      'bg-gradient-to-br from-blue-50 to-indigo-50 border-l-blue-500 hover:from-blue-100 hover:to-indigo-100'
-                    }`} style={{ animationDelay: `${index * 0.1}s` }}>
-                      <div className="flex justify-between items-start mb-3">
-                        <div className="flex items-center gap-3">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm ${
-                            msg.role === 'reviewer' ? 'bg-gradient-to-br from-purple-500 to-violet-600' :
-                            msg.role === 'staff' ? 'bg-gradient-to-br from-green-500 to-emerald-600' :
-                            'bg-gradient-to-br from-blue-500 to-indigo-600'
-                          }`}>
-                            {msg.sender.charAt(0).toUpperCase()}
+                ))}
+              </div>
+            </div>
+
+            {/* Collaborative Document Editor */}
+            <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+              <div className="mb-4">
+                <div className="flex justify-between items-center mb-4">
+                  <h3 className="text-xl font-bold text-blue-900">▤ Collaborative Document</h3>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={addInlineComment}
+                      className="bg-yellow-100 hover:bg-yellow-200 text-yellow-800 px-3 py-2 rounded-lg text-sm font-semibold transition-colors"
+                    >
+                      ✍ Add Comment
+                    </button>
+                    <span className="text-sm text-black">Auto-sync enabled</span>
+                    <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  </div>
+                </div>
+                
+                {/* Inline Comments & AI Suggestions Panel */}
+                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+                  <h4 className="font-semibold text-black mb-3">Comments & AI Suggestions</h4>
+                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                    {inlineComments.map((comment) => (
+                      <div key={comment.id} className={`p-2 rounded text-xs ${
+                        comment.type === 'ai_suggestion' 
+                          ? 'bg-purple-100 border-l-2 border-purple-500' 
+                          : 'bg-blue-100 border-l-2 border-blue-500'
+                      }`}>
+                        <div className="flex justify-between items-start mb-1">
+                          <span className="font-semibold">
+                            {comment.type === 'ai_suggestion' 
+                              ? `🤖 AI: ${comment.category}` 
+                              : `${comment.author} (${comment.role})`}
+                          </span>
+                          <span className="text-gray-500">{comment.timestamp}</span>
+                        </div>
+                        <p className="text-black">{comment.text}</p>
+                        {comment.confidence && (
+                          <div className="mt-1">
+                            <span className="text-xs text-gray-600">Confidence: {comment.confidence}%</span>
                           </div>
-                          <div>
-                            <span className="font-bold text-slate-900 text-sm">{msg.sender}</span>
-                            <span className={`ml-2 px-2 py-1 rounded-full text-xs font-semibold ${
-                              msg.role === 'reviewer' ? 'bg-purple-200 text-purple-800' :
-                              msg.role === 'staff' ? 'bg-green-200 text-green-800' :
-                              'bg-blue-200 text-blue-800'
-                            }`}>
-                              {msg.role.toUpperCase()}
-                            </span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* Editor Toolbar */}
+                <div className="border border-gray-200 rounded-md p-3 mb-4 bg-gray-50">
+                  <div className="flex gap-1 items-center mb-2">
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleBold().run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive('bold') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                    >
+                      <strong>B</strong>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleItalic().run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive('italic') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                    >
+                      <em>I</em>
+                    </button>
+                    <div className="w-px bg-gray-300 mx-2 h-6"></div>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleHeading({ level: 2 }).run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive('heading', { level: 2 }) ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                    >
+                      H2
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => editor?.chain().focus().toggleBulletList().run()}
+                      className={`px-3 py-2 rounded text-sm transition-colors ${
+                        editor?.isActive('bulletList') ? 'bg-blue-600 text-white' : 'bg-black text-white hover:bg-gray-800'
+                      }`}
+                    >
+                      • List
+                    </button>
+                    <div className="w-px bg-gray-300 mx-2 h-6"></div>
+                    <button
+                      type="button"
+                      onClick={insertTable}
+                      className="bg-black text-white px-3 py-2 rounded text-sm hover:bg-gray-800"
+                    >
+                      ▦ Table
+                    </button>
+                    <button
+                      type="button"
+                      onClick={insertImage}
+                      className="bg-black text-white px-3 py-2 rounded text-sm hover:bg-gray-800"
+                    >
+                      ▣ Image
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Editor Content */}
+              <div className="prose max-w-none">
+                <div className="border border-gray-300 rounded-md min-h-[600px] p-6 bg-white relative">
+                  <EditorContent 
+                    editor={editor} 
+                    className="focus:outline-none min-h-[550px] text-black"
+                    style={{ color: 'black' }}
+                  />
+                  
+                  {/* Floating AI Suggestions */}
+                  <div className="absolute top-4 right-4 space-y-2">
+                    <div className="bg-purple-100 border border-purple-300 rounded-lg p-3 max-w-xs text-xs shadow-lg">
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-purple-600 font-semibold">🤖 AI Suggestion</span>
+                        <span className="text-xs text-gray-500">Budget</span>
+                      </div>
+                      <p className="text-black">Consider reducing equipment costs by 15% and hiring contract specialists for reactor design.</p>
+                      <div className="mt-2 text-xs text-purple-600">Confidence: 87%</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Document Stats */}
+              <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
+                <div className="flex items-center gap-6 text-sm text-black">
+                  <span><strong>Words: {wordCount}</strong></span>
+                  <span><strong>Characters: {characterCount}</strong></span>
+                  <span className="text-green-600">✓ Auto-saved: 2 min ago</span>
+                </div>
+                <button
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
+                  onClick={() => alert('Changes synchronized with all collaborators!')}
+                >
+                  💾 Sync Changes
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Sidebar Panels */}
+          {(showVersionHistory || showCommunication || showAIAssistant) && (
+            <div className="lg:col-span-1 space-y-6">
+              {/* Version History Sidebar */}
+              {showVersionHistory && (
+                <div className="bg-white rounded-lg shadow-md p-6">
+                  <h3 className="text-lg font-bold text-blue-900 mb-4">📊 Version History</h3>
+                  <div className="space-y-3">
+                    {versionHistory.map((version) => (
+                      <div key={version.id} className="border border-gray-200 rounded-lg p-3">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="font-semibold text-black">v{version.version}</span>
+                          <span className="text-xs text-gray-500">{version.timestamp}</span>
+                        </div>
+                        <p className="text-sm text-black mb-2">{version.changes}</p>
+                        <div className="flex items-center gap-2">
+                          <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            {version.author.charAt(0)}
+                          </div>
+                          <span className="text-xs text-black font-semibold">{version.author}</span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Communication Panel */}
+              {showCommunication && (
+                <div className="bg-white rounded-lg shadow-md">
+                  <div className="bg-blue-600 text-white p-4 rounded-t-lg">
+                    <h3 className="text-lg font-bold">💬 Team Discussion</h3>
+                  </div>
+                  <div className="p-4">
+                    <div className="space-y-3 mb-4 max-h-80 overflow-y-auto">
+                      {messages.map((message) => (
+                        <div key={message.id} className="flex gap-3">
+                          <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${
+                            message.sender === 'Dr. Sarah Chen' ? 'bg-blue-600' :
+                            message.sender === 'Prof. Michael Kumar' ? 'bg-purple-600' :
+                            message.sender === 'AI Assistant' ? 'bg-green-600' : 'bg-gray-600'
+                          }`}>
+                            {message.sender === 'AI Assistant' ? '🤖' : message.sender.charAt(0)}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="font-semibold text-black text-sm">{message.sender}</span>
+                              <span className="text-xs text-gray-500">{message.time}</span>
+                            </div>
+                            <p className="text-sm text-black">{message.content}</p>
                           </div>
                         </div>
-                        <span className="text-xs text-slate-500 font-medium">
-                          {new Date(msg.timestamp).toLocaleString()}
-                        </span>
-                      </div>
-                      <p className="text-slate-700 font-medium leading-relaxed whitespace-pre-wrap ml-11">{msg.message}</p>
+                      ))}
                     </div>
-                  ))}
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        placeholder="Type your message..."
+                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-black"
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter' && e.target.value.trim()) {
+                            handleChatSubmit(e.target.value);
+                            e.target.value = '';
+                          }
+                        }}
+                      />
+                      <button
+                        type="button"
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                      >
+                        Send
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* AI Assistant Panel */}
+              {showAIAssistant && (
+                <div className="bg-white rounded-lg shadow-md">
+                  <div className="bg-purple-600 text-white p-4 rounded-t-lg">
+                    <h3 className="text-lg font-bold">🤖 AI Assistant</h3>
+                  </div>
+                  <div className="p-4">
+                    <div className="space-y-3 mb-4">
+                      <div className="bg-purple-50 p-3 rounded-lg">
+                        <div className="text-sm font-semibold text-purple-800 mb-2">Recent Suggestions</div>
+                        <div className="space-y-2">
+                          <div className="text-xs text-black bg-white p-2 rounded border-l-2 border-purple-500">
+                            <strong>Budget Optimization:</strong> Consider reducing equipment costs by exploring partnerships with industrial collaborators.
+                          </div>
+                          <div className="text-xs text-black bg-white p-2 rounded border-l-2 border-blue-500">
+                            <strong>Technical Review:</strong> The gasification temperature range should be expanded to include lower temperature scenarios.
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Ask AI about your proposal..."
+                          className="flex-1 px-3 py-2 border border-gray-300 rounded-lg text-black text-sm"
+                        />
+                        <button
+                          type="button"
+                          className="bg-purple-600 text-white px-3 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm"
+                        >
+                          Ask
+                        </button>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
-            
-            {/* Message Input */}
-            <div className="p-6 border-t border-green-200/70 bg-gradient-to-r from-green-50/50 to-emerald-50/30">
-              <div className="mb-3">
-                <div className="flex items-center gap-2 text-sm">
-                  <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center">
-                    <span className="text-white font-bold text-xs">{user?.name?.charAt(0)}</span>
-                  </div>
-                  <span className="text-green-700 font-semibold">
-                    Chatting as: <span className="text-slate-900">{user?.name}</span>
-                  </span>
-                  <span className="px-2 py-1 bg-green-200 text-green-800 rounded-full text-xs font-bold">
-                    {user?.role?.toUpperCase()}
-                  </span>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <input
-                  type="text"
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type your message to collaborate..."
-                  className="flex-1 p-4 border-2 border-green-300 rounded-xl focus:border-green-500 focus:outline-none text-slate-900 bg-white/90 font-medium placeholder-green-400 transition-all duration-300 hover:shadow-md"
-                  onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                />
-                <button
-                  onClick={sendMessage}
-                  disabled={!newMessage.trim()}
-                  className="bg-gradient-to-r from-green-500 to-emerald-600 text-white px-6 py-4 rounded-xl hover:from-green-600 hover:to-emerald-700 font-bold disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:shadow-lg transform hover:scale-105 flex items-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                  Send
-                </button>
-              </div>
-            </div>
-          </div>
-
-          {/* Role-specific Action Panel */}
-          <div className="space-y-6">
-            {/* Staff Report Submission */}
-            {isStaff() && (
-              <div className="bg-gradient-to-br from-white via-green-50/30 to-emerald-50/20 p-6 rounded-2xl shadow-xl border border-green-200/70">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900">Submit Research Report</h3>
-                    <p className="text-green-600 text-sm font-medium">Share your findings with stakeholders</p>
-                  </div>
-                </div>
-                <textarea
-                  value={report}
-                  onChange={(e) => setReport(e.target.value)}
-                  placeholder="Enter your detailed research report here..."
-                  className="w-full p-4 border-2 border-green-300 rounded-xl h-32 mb-4 text-slate-900 bg-white/90 font-medium focus:border-green-500 focus:outline-none placeholder-green-400 transition-all duration-300 hover:shadow-md"
-                />
-                <button
-                  onClick={submitReport}
-                  className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl hover:from-green-600 hover:to-emerald-700 font-bold transition-all duration-300 hover:shadow-lg transform hover:scale-105 flex items-center justify-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Submit Report
-                </button>
-              </div>
-            )}
-
-            {/* Reviewer Feedback */}
-            {isReviewer() && (
-              <div className="bg-gradient-to-br from-white via-purple-50/30 to-violet-50/20 p-6 rounded-2xl shadow-xl border border-purple-200/70">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-violet-600 rounded-xl flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900">Provide Feedback</h3>
-                    <p className="text-purple-600 text-sm font-medium">Share your expert review insights</p>
-                  </div>
-                </div>
-                <textarea
-                  value={feedback}
-                  onChange={(e) => setFeedback(e.target.value)}
-                  placeholder="Enter your review feedback here..."
-                  className="w-full p-4 border-2 border-purple-300 rounded-xl h-32 mb-4 text-slate-900 bg-white/90 font-medium focus:border-purple-500 focus:outline-none placeholder-purple-400 transition-all duration-300 hover:shadow-md"
-                />
-                <button
-                  onClick={submitFeedback}
-                  className="w-full bg-gradient-to-r from-purple-500 to-violet-600 text-white py-3 rounded-xl hover:from-purple-600 hover:to-violet-700 font-bold transition-all duration-300 hover:shadow-lg transform hover:scale-105 flex items-center justify-center gap-2"
-                >
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  Submit Feedback
-                </button>
-              </div>
-            )}
-
-            {/* User Actions */}
-            {isUser() && (
-              <div className="bg-gradient-to-br from-white via-blue-50/30 to-indigo-50/20 p-6 rounded-2xl shadow-xl border border-blue-200/70">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center">
-                    <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-900">Proposal Actions</h3>
-                    <p className="text-blue-600 text-sm font-medium">Manage your proposal</p>
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <button
-                    onClick={() => router.push(`/proposal/edit/${id}`)}
-                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-xl hover:from-blue-600 hover:to-indigo-700 font-bold transition-all duration-300 hover:shadow-lg transform hover:scale-105 flex items-center justify-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    Edit Proposal
-                  </button>
-                  <button
-                    onClick={() => router.push(`/proposal/track/${id}`)}
-                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-3 rounded-xl hover:from-green-600 hover:to-emerald-700 font-bold transition-all duration-300 hover:shadow-lg transform hover:scale-105 flex items-center justify-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    Track Progress
-                  </button>
-                </div>
-              </div>
-            )}
-
-            {/* Proposal Info */}
-            <div className="bg-gradient-to-br from-white via-slate-50/50 to-gray-50/30 p-6 rounded-2xl shadow-xl border border-slate-200/70">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-slate-500 to-gray-600 rounded-xl flex items-center justify-center">
-                  <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                  </svg>
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold text-slate-900">Proposal Details</h3>
-                  <p className="text-slate-600 text-sm font-medium">Key information and metrics</p>
-                </div>
-              </div>
-              <div className="space-y-4 text-sm">
-                {proposal.budget && (
-                  <div className="flex justify-between items-center p-3 bg-gradient-to-r from-green-50 to-emerald-50 rounded-lg border border-green-200">
-                    <span className="text-green-700 font-semibold flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                      </svg>
-                      Budget:
-                    </span>
-                    <span className="font-bold text-green-800">₹{proposal.budget.toLocaleString()}</span>
-                  </div>
-                )}
-                <div className="flex justify-between items-center p-3 bg-gradient-to-r from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
-                  <span className="text-blue-700 font-semibold flex items-center gap-2">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3a2 2 0 012-2h4a2 2 0 012 2v4m-6 4v10m6-10v10" />
-                    </svg>
-                    Created:
-                  </span>
-                  <span className="font-bold text-blue-800">
-                    {new Date(proposal.createdAt).toLocaleDateString()}
-                  </span>
-                </div>
-                {proposal.assignedStaff && (
-                  <div className="flex justify-between items-center p-3 bg-gradient-to-r from-orange-50 to-red-50 rounded-lg border border-orange-200">
-                    <span className="text-orange-700 font-semibold flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                      Assigned Staff:
-                    </span>
-                    <span className="font-bold text-orange-800">{proposal.assignedStaff}</span>
-                  </div>
-                )}
-                {proposal.reviewer && (
-                  <div className="flex justify-between items-center p-3 bg-gradient-to-r from-purple-50 to-violet-50 rounded-lg border border-purple-200">
-                    <span className="text-purple-700 font-semibold flex items-center gap-2">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
-                      </svg>
-                      Reviewer:
-                    </span>
-                    <span className="font-bold text-purple-800">{proposal.reviewer}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          )}
         </div>
-      </main>
+      </div>
 
       <style jsx>{`
         @keyframes fade-in-up {
