@@ -1,169 +1,527 @@
 import { useState, useEffect, useRef } from "react";
 
-export default function Chatbot() {
-  const [messages, setMessages] = useState([{ role: "bot", text: "Namaste! I'm your AI assistant. I can help you draft research proposals and navigate the NaCCER portal. How may I assist you today? 🙏" }]);
-  const [input, setInput] = useState("");
-  const [isMinimized, setIsMinimized] = useState(false);
+export default function Chatbot({ showSaarthi, setShowSaarthi }) {
+  console.log('Chatbot render - showSaarthi:', showSaarthi);
+  
+  // Chat State
+  const [chatMessages, setChatMessages] = useState([
+    { 
+      type: 'bot', 
+      text: 'नमस्कार! स्वागतम्! Welcome! I\'m SAARTHI, your intelligent multilingual AI research assistant. I support Hindi, English, Tamil, Telugu, Bengali, Marathi, Gujarati, Punjabi, Kannada, Malayalam, Odia, and Assamese for comprehensive assistance.',
+      timestamp: new Date().toLocaleTimeString()
+    },
+    {
+      type: 'bot',
+      text: 'I can assist you with:\n• Advanced research methodology design\n• Coal technology innovation strategies\n• Budget optimization and resource allocation\n• Technical writing and documentation\n• NaCCER compliance and S&T guidelines\n• Multi-institutional collaboration frameworks\n\nWhat specific aspect of your proposal would you like to explore?',
+      timestamp: new Date().toLocaleTimeString()
+    }
+  ]);
+  const [currentMessage, setCurrentMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const messagesEndRef = useRef(null);
+  const [shouldBounce, setShouldBounce] = useState(false);
+  const [showRing, setShowRing] = useState(false);
+  
+  // Chat scroll reference
+  const chatMessagesRef = useRef(null);
 
+  // Auto-scroll to bottom function
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
-
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
-
-  const handleSend = () => {
-    if (!input.trim()) return;
-    
-    const userMessage = { role: "user", text: input };
-    setMessages(prev => [...prev, userMessage]);
-    setInput("");
-    setIsTyping(true);
-
-    // Simulate AI response with delay
-    setTimeout(() => {
-      const responses = [
-        "I'll help you with that right away! Let me process your request... 🚀",
-        "That's a great question! I'm analyzing the best approach for your proposal. ✨",
-        "Thank you for that information. I'm preparing comprehensive guidance for you. 📝",
-        "Excellent! I'm gathering relevant resources and templates to assist you. 🎯"
-      ];
-      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
-      
-      setMessages(prev => [...prev, { role: "bot", text: randomResponse }]);
-      setIsTyping(false);
-    }, 1500);
-  };
-
-  const handleKeyPress = (e) => {
-    if (e.key === 'Enter') {
-      handleSend();
+    if (chatMessagesRef.current) {
+      chatMessagesRef.current.scrollTo({
+        top: chatMessagesRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
     }
   };
 
-  if (isMinimized) {
-    return (
-      <div className="fixed bottom-6 right-6 z-50">
-        <button
-          onClick={() => setIsMinimized(false)}
-          className="group w-16 h-16 bg-gradient-to-br from-orange-500 via-orange-600 to-red-600 hover:from-orange-600 hover:to-red-700 rounded-full shadow-2xl flex items-center justify-center transition-all duration-500 hover:scale-110 animate-bounce"
-        >
-          <svg className="w-8 h-8 text-white group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-        </button>
-      </div>
-    );
-  }
+  // Auto-scroll when messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [chatMessages]);
+
+  // Handle 30-second bounce and ring animation
+  useEffect(() => {
+    console.log('Chatbot component mounted, showSaarthi:', showSaarthi);
+    
+    const startAnimations = () => {
+      console.log('Starting bounce and ring animations');
+      setShouldBounce(true);
+      
+      // Ring effects timing to match with 3 bounces
+      // First ring
+      setShowRing(true);
+      setTimeout(() => setShowRing(false), 1000);
+      
+      // Second ring (after ~2s)
+      setTimeout(() => {
+        setShowRing(true);
+        setTimeout(() => setShowRing(false), 1000);
+      }, 2000);
+      
+      // Third ring (after ~4s)
+      setTimeout(() => {
+        setShowRing(true);
+        setTimeout(() => setShowRing(false), 1000);
+      }, 4000);
+      
+      // Stop bounce after animation completes (2s animation * 3 iterations = 6s)
+      setTimeout(() => {
+        setShouldBounce(false);
+      }, 6000);
+    };
+
+    // Start first animation after 15 seconds
+    const initialTimeout = setTimeout(() => {
+      console.log('15 seconds passed, starting animations');
+      startAnimations();
+    }, 15000);
+
+    // Then repeat every 15 seconds
+    const interval = setInterval(() => {
+      console.log('15 second interval triggered');
+      startAnimations();
+    }, 15000);
+
+    return () => {
+      clearTimeout(initialTimeout);
+      clearInterval(interval);
+    };
+  }, []);
+
+  // SAARTHI Chat Handler
+  const handleChatSubmit = (e) => {
+    e.preventDefault();
+    if (!currentMessage.trim()) return;
+    
+    // Add user message
+    const userMessage = {
+      type: 'user',
+      text: currentMessage,
+      timestamp: new Date().toLocaleTimeString()
+    };
+    
+    setChatMessages(prev => [...prev, userMessage]);
+    setCurrentMessage('');
+    setIsTyping(true);
+    
+    // Auto scroll after user message
+    setTimeout(() => {
+      scrollToBottom();
+    }, 100);
+    
+    // Simulate AI processing and response
+    setTimeout(() => {
+      const responses = [
+        'मैं आपके अनुसंधान प्रस्ताव के लिए विस्तृत रणनीति तैयार कर रहा हूँ। आइए कोयला प्रौद्योगिकी में नवाचार के अवसरों पर चर्चा करते हैं।',
+        'Excellent query! For coal technology research, I recommend focusing on clean coal technologies, carbon capture methods, and sustainable mining practices. Let me suggest some specific research directions.',
+        'Based on NaCCER guidelines, your proposal should emphasize multi-institutional collaboration and technology transfer potential. I can help structure your methodology section.',
+        'आपका बजट अनुकूलन एक महत्वपूर्ण पहलू है। मैं संसाधन आवंटन और cost-effectiveness metrics के लिए सुझाव दे सकता हूँ।',
+        'For S&T compliance, ensure your proposal aligns with national coal research priorities. I can guide you through the technical documentation requirements.',
+        'Consider incorporating AI/ML applications in coal analysis and predictive maintenance. This aligns with current research trends and funding priorities.',
+        'Your research timeline should include milestone-based deliverables. Let me help you create a realistic implementation schedule.',
+        'Multi-language documentation support is available. আমি বাংলা, हिंदी, English और अन्य भारतीय भाषाओं में सहायता कर सकता हूँ।'
+      ];
+      
+      const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+      
+      const botMessage = {
+        type: 'bot',
+        text: randomResponse,
+        timestamp: new Date().toLocaleTimeString()
+      };
+      
+      setChatMessages(prev => [...prev, botMessage]);
+      setIsTyping(false);
+      
+      // Auto scroll after bot message
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100);
+    }, 2000);
+  };
+
+  // Custom CSS animations for SAARTHI chatbot
+  useEffect(() => {
+    const styles = `
+      @keyframes slide-in-right {
+        from {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+        to {
+          transform: translateX(0);
+          opacity: 1;
+        }
+      }
+
+      @keyframes slide-out-right {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+
+      @keyframes warm-glow {
+        0%, 100% {
+          opacity: 0.3;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.6;
+          transform: scale(1.05);
+        }
+      }
+
+      @keyframes float {
+        0%, 100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(-10px) rotate(180deg);
+        }
+      }
+
+      @keyframes float-reverse {
+        0%, 100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        50% {
+          transform: translateY(10px) rotate(-180deg);
+        }
+      }
+
+      @keyframes fade-in {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes message-slide-up {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slide-out-left {
+        from {
+          transform: translateX(0);
+          opacity: 1;
+        }
+        to {
+          transform: translateX(100%);
+          opacity: 0;
+        }
+      }
+
+      .animate-slide-in-right {
+        animation: slide-in-right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+
+      .animate-slide-out-right {
+        animation: slide-out-right 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+
+      .animate-warm-glow {
+        animation: warm-glow 3s ease-in-out infinite;
+      }
+
+      .animate-float {
+        animation: float 4s ease-in-out infinite;
+      }
+
+      .animate-float-reverse {
+        animation: float-reverse 4s ease-in-out infinite;
+      }
+
+      .animate-fade-in {
+        animation: fade-in 0.3s ease-out;
+      }
+
+      .animate-message-slide-up {
+        animation: message-slide-up 0.3s ease-out;
+      }
+
+      .animate-slide-out-left {
+        animation: slide-out-left 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      }
+
+      .animation-delay-1000 {
+        animation-delay: 1s;
+      }
+
+      .animation-delay-2000 {
+        animation-delay: 2s;
+      }
+
+      .animation-delay-3000 {
+        animation-delay: 3s;
+      }
+
+      .animation-delay-4000 {
+        animation-delay: 4s;
+      }
+
+      .animation-delay-5000 {
+        animation-delay: 5s;
+      }
+
+      .animate-delayed-bounce {
+        animation: delayed-bounce 2s ease-in-out;
+        animation-iteration-count: 3;
+      }
+
+      @keyframes delayed-bounce {
+        0%, 20%, 50%, 80%, 100% {
+          transform: translateY(0);
+        }
+        40% {
+          transform: translateY(-10px);
+        }
+        60% {
+          transform: translateY(-5px);
+        }
+      }
+
+      .animate-delayed-ring {
+        animation: delayed-ring 1s ease-out;
+      }
+
+      .animate-blink-green {
+        animation: blink-green 2s ease-in-out infinite;
+      }
+
+      @keyframes delayed-ring {
+        0% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        100% {
+          transform: scale(1.4);
+          opacity: 0;
+        }
+      }
+
+      @keyframes blink-green {
+        0%, 50% {
+          opacity: 1;
+          transform: scale(1);
+          box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+        }
+        25% {
+          opacity: 0.4;
+          transform: scale(0.8);
+          box-shadow: 0 0 15px rgba(34, 197, 94, 0.8);
+        }
+        75% {
+          opacity: 1;
+          transform: scale(1.1);
+          box-shadow: 0 0 12px rgba(34, 197, 94, 0.7);
+        }
+        100% {
+          opacity: 1;
+          transform: scale(1);
+          box-shadow: 0 0 8px rgba(34, 197, 94, 0.6);
+        }
+      }
+    `;
+
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = styles;
+    document.head.appendChild(styleSheet);
+
+    return () => {
+      document.head.removeChild(styleSheet);
+    };
+  }, []);
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 z-50 animate-fade-in-up">
-      {/* Chatbot Container */}
-      <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden backdrop-blur-lg">
-        {/* Header */}
-        <div className="bg-gradient-to-r from-orange-500 via-orange-600 to-red-600 px-6 py-4 text-white">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center animate-pulse">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364-.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-                </svg>
+    <>
+      {/* Floating Toggle Button */}
+      {!showSaarthi && (
+        <div className="fixed bottom-8 right-8 z-50">
+          <div className={`relative group ${shouldBounce ? 'animate-delayed-bounce' : ''}`}>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('SAARTHI button clicked');
+                setShouldBounce(false); // Stop bouncing when clicked
+                setShowSaarthi(true);
+              }}
+              className="group relative overflow-hidden w-16 h-16 bg-gradient-to-br from-orange-500 via-white to-green-500 hover:from-orange-600 hover:to-green-600 rounded-2xl shadow-2xl flex items-center justify-center transition-all duration-500 hover:scale-110 hover:rotate-3 transform border-4 border-white cursor-pointer z-30"
+              style={{
+                background: 'linear-gradient(135deg, #ff7f00 0%, #ff7f00 25%, #ffffff 25%, #ffffff 75%, #138808 75%, #138808 100%)',
+                filter: 'drop-shadow(0 10px 25px rgba(0,0,0,0.2))',
+                pointerEvents: 'auto'
+              }}
+            >
+              <div className="relative z-10 flex items-center justify-center">
+                <img src="/images/AI assistant logo.png" alt="SAARTHI" className="w-8 h-8 rounded-lg shadow-lg transform group-hover:scale-110 transition-transform duration-300" />
+                {/* Active indicator dot - more visible and positioned correctly */}
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-lg animate-blink-green" style={{ zIndex: 1000 }}></div>
               </div>
-              <div>
-                <h3 className="font-bold text-lg">AI Sahayak</h3>
-                <p className="text-orange-100 text-sm">Research Assistant</p>
+              
+              {/* Floating Effects */}
+              <div className="absolute inset-0 rounded-2xl animate-warm-glow"
+                style={{
+                  background: 'linear-gradient(135deg, #ff7f00 0%, #ffffff 50%, #138808 100%)',
+                  filter: 'blur(20px)',
+                  opacity: '0.6',
+                  zIndex: -1
+                }}></div>
+            </button>
+            
+            {/* Enhanced Tooltip */}
+            <div className="absolute bottom-full right-0 mb-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform group-hover:translate-y-0 translate-y-2 pointer-events-none">
+              <div className="bg-black/90 text-white px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap shadow-2xl backdrop-blur-sm border border-white/10">
+                <div className="flex items-center gap-2">
+                  <span>Launch SAARTHI AI</span>
+                </div>
+                <div className="absolute top-full right-4 w-0 h-0 border-t-4 border-t-black/90 border-l-4 border-l-transparent border-r-4 border-r-transparent"></div>
               </div>
             </div>
-            <button
-              onClick={() => setIsMinimized(true)}
-              className="w-8 h-8 bg-white/20 hover:bg-white/30 rounded-lg flex items-center justify-center transition-all duration-300 hover:scale-110"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-              </svg>
-            </button>
+            
+            {/* Notification Badge */}
+            <div style={{ zIndex: 100 }} className="absolute -top-1 -left-1 w-6 h-6 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold border-2 border-white shadow-lg">
+              AI
+            </div>
+            
+            {/* Animated Ring Effects - Only when showRing is true */}
+            {showRing && (
+              <>
+                <div className="absolute inset-0 rounded-2xl border-2 border-orange-400 animate-delayed-ring"></div>
+                <div className="absolute inset-0 rounded-2xl border-2 border-green-400 animate-delayed-ring" style={{ animationDelay: '0.2s' }}></div>
+              </>
+            )}
           </div>
         </div>
+      )}
 
-        {/* Messages Area */}
-        <div className="h-80 overflow-y-auto p-4 bg-gradient-to-b from-slate-50 to-white scroll-smooth">
-          <div className="space-y-4">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${message.role === "user" ? "justify-end" : "justify-start"} animate-fade-in-up`}
-                style={{ animationDelay: `${index * 100}ms` }}
+      {/* SAARTHI Chat Window */}
+      {showSaarthi && (
+        <div className="saarthi-chat-window fixed top-0 right-0 w-1/3 h-full bg-white border-l-2 border-blue-300 shadow-2xl z-50 flex flex-col animate-slide-in-right">
+          {/* Chat Header */}
+          <div className="bg-gradient-to-r from-slate-800 via-blue-800 to-indigo-800 p-4 border-b border-blue-300">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="relative w-10 h-10 rounded-full flex items-center justify-center shadow-md"
+                  style={{
+                    background: 'linear-gradient(135deg, #ff7f00 0%, #ff7f00 33%, #ffffff 33%, #ffffff 66%, #138808 66%, #138808 100%)'
+                  }}>
+                  <img src="/images/AI assistant logo.png" alt="SAARTHI" className="w-8 h-8 rounded-full" />
+                  {/* Active indicator dot - positioned outside overflow hidden container */}
+                </div>
+                {/* Green dot positioned outside the logo container */}
+                <div className="absolute top-5 left-12 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-lg animate-blink-green" style={{ zIndex: 1000 }}></div>
+                <div>
+                  <h3 className="font-bold text-white text-lg">SAARTHI AI</h3>
+                  <p className="text-sm text-blue-100">Research Assistant</p>
+                </div>
+              </div>
+              <button
+                onClick={() => {
+                  console.log('Close button clicked');
+                  const chatWindow = document.querySelector('.saarthi-chat-window');
+                  if (chatWindow) {
+                    chatWindow.classList.add('animate-slide-out-left');
+                    setTimeout(() => {
+                      setShowSaarthi(false);
+                    }, 300);
+                  } else {
+                    setShowSaarthi(false);
+                  }
+                }}
+                className="text-blue-100 hover:text-white p-2 rounded-full hover:bg-blue-700/50 transition-colors"
               >
-                <div className={`max-w-xs lg:max-w-md px-4 py-3 rounded-2xl shadow-lg ${
-                  message.role === "user"
-                    ? "bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-br-md"
-                    : "bg-gradient-to-br from-slate-100 to-slate-200 text-slate-800 rounded-bl-md border border-slate-300"
-                }`}>
-                  <p className="text-sm leading-relaxed">{message.text}</p>
-                  <div className={`text-xs mt-2 opacity-70 ${
-                    message.role === "user" ? "text-blue-100" : "text-slate-500"
-                  }`}>
-                    {new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' })}
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          {/* Chat Messages */}
+          <div 
+            ref={chatMessagesRef}
+            className="flex-1 overflow-y-auto p-4 space-y-3 bg-blue-50"
+          >
+            {chatMessages.map((message, index) => (
+              <div key={index} className={`flex ${message.type === 'user' ? 'justify-end' : 'justify-start'} animate-message-slide-up`}>
+                <div className={`max-w-[80%] p-3 rounded-lg ${
+                  message.type === 'user' 
+                    ? 'bg-gradient-to-r from-orange-500 to-red-600 text-white rounded-br-none' 
+                    : 'bg-white text-black border border-blue-200 rounded-bl-none'
+                } shadow-md`}>
+                  <div className="text-sm">
+                    {message.text.split('\n').map((line, lineIndex) => (
+                      <div key={lineIndex} className="mb-1">
+                        {line}
+                      </div>
+                    ))}
                   </div>
+                  {message.timestamp && (
+                    <div className={`text-xs mt-1 ${
+                      message.type === 'user' ? 'text-orange-100' : 'text-blue-500'
+                    }`}>
+                      {message.timestamp}
+                    </div>
+                  )}
                 </div>
               </div>
             ))}
             
-            {/* Typing Indicator */}
             {isTyping && (
-              <div className="flex justify-start animate-fade-in-up">
-                <div className="bg-gradient-to-br from-slate-100 to-slate-200 px-4 py-3 rounded-2xl rounded-bl-md border border-slate-300 shadow-lg">
+              <div className="flex justify-start animate-message-slide-up">
+                <div className="bg-white border border-blue-200 rounded-lg rounded-bl-none p-3 shadow-md">
                   <div className="flex items-center gap-2">
                     <div className="flex gap-1">
-                      <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce"></div>
-                      <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce animation-delay-200"></div>
-                      <div className="w-2 h-2 bg-orange-500 rounded-full animate-bounce animation-delay-400"></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce animation-delay-1000"></div>
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-bounce animation-delay-2000"></div>
                     </div>
-                    <span className="text-slate-600 text-xs">AI Sahayak is typing...</span>
+                    <span className="text-blue-500 text-sm">SAARTHI is typing...</span>
                   </div>
                 </div>
               </div>
             )}
-            <div ref={messagesEndRef} />
           </div>
-        </div>
 
-        {/* Input Area */}
-        <div className="p-4 bg-white border-t border-slate-200">
-          <div className="flex items-center gap-3">
-            <div className="flex-1 relative">
+          {/* Chat Input */}
+          <div className="p-4 bg-white border-t border-blue-200">
+            <form onSubmit={handleChatSubmit} className="flex gap-3">
               <input
                 type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyPress={handleKeyPress}
-                className="w-full px-4 py-3 pr-12 border border-slate-300 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-500/20 focus:outline-none text-slate-900 bg-slate-50 hover:bg-white transition-all duration-300"
-                placeholder="Type your message... (Press Enter to send)"
+                value={currentMessage}
+                onChange={(e) => setCurrentMessage(e.target.value)}
+                className="flex-1 px-4 py-2 border border-blue-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                placeholder="Ask SAARTHI anything..."
                 disabled={isTyping}
               />
-              <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                <div className="w-6 h-6 bg-gradient-to-br from-orange-400 to-red-500 rounded-full flex items-center justify-center">
-                  <svg className="w-3 h-3 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-                  </svg>
-                </div>
-              </div>
-            </div>
-            <button
-              onClick={handleSend}
-              disabled={!input.trim() || isTyping}
-              className="group bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:from-slate-400 disabled:to-slate-500 text-white p-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 disabled:hover:transform-none disabled:hover:shadow-lg flex items-center justify-center"
-            >
-              <svg className="w-5 h-5 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
-              </svg>
-            </button>
+              <button
+                type="submit"
+                disabled={!currentMessage.trim() || isTyping}
+                className="bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 disabled:bg-gray-400 text-white px-6 py-2 rounded-lg font-medium transition-all duration-300 hover:shadow-md"
+              >
+                Send
+              </button>
+            </form>
           </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }
