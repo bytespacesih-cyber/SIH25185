@@ -428,7 +428,7 @@ export default function Chatbot({ showSaarthi, setShowSaarthi }) {
                 {/* Green dot positioned outside the logo container */}
                 <div className="absolute top-5 left-12 w-3 h-3 bg-green-500 rounded-full border-2 border-white shadow-lg animate-blink-green" style={{ zIndex: 1000 }}></div>
                 <div>
-                  <h3 className="font-bold text-white text-lg">SAARTHI AI</h3>
+                  <h3 className="font-bold text-white text-lg">Enna da Prachana</h3>
                   <p className="text-sm text-blue-100">Research Assistant</p>
                 </div>
               </div>
