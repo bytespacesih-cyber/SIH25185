@@ -27,6 +27,10 @@ function CollaborateContent() {
   const [showVersionHistory, setShowVersionHistory] = useState(false);
   const [showCommunication, setShowCommunication] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
+  const [showInviteModal, setShowInviteModal] = useState(false);
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('Research Collaborator');
+  const [inviteMessage, setInviteMessage] = useState('');
   const [wordCount, setWordCount] = useState(0);
   const [characterCount, setCharacterCount] = useState(0);
   const [chatMessages, setChatMessages] = useState([
@@ -366,6 +370,56 @@ function CollaborateContent() {
     alert('Click on text to add inline comments (Demo feature)');
   };
 
+  // Email validation function
+  const isValidEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  // Handle sending collaboration invitation
+  const handleSendInvitation = async () => {
+    if (!inviteEmail.trim() || !isValidEmail(inviteEmail)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    try {
+      const invitationData = {
+        proposalId: id,
+        proposalTitle: proposal?.title || 'Untitled Proposal',
+        email: inviteEmail,
+        role: inviteRole,
+        message: inviteMessage,
+        inviterName: user?.name || 'Anonymous User'
+      };
+
+      // Send invitation request to backend
+      const response = await fetch('http://localhost:5000/api/collaboration/invite', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(invitationData)
+      });
+
+      if (response.ok) {
+        alert(`Invitation sent successfully to ${inviteEmail}`);
+        // Reset form
+        setInviteEmail('');
+        setInviteRole('Research Collaborator');
+        setInviteMessage('');
+        setShowInviteModal(false);
+      } else {
+        const error = await response.json();
+        alert(`Failed to send invitation: ${error.message}`);
+      }
+    } catch (error) {
+      console.error('Error sending invitation:', error);
+      alert('Failed to send invitation. Please try again.');
+    }
+  };
+
   const fetchProposal = async () => {
     try {
       setLoading(true);
@@ -564,10 +618,10 @@ function CollaborateContent() {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
                   <h2 className="text-2xl font-bold text-blue-900 mb-2">{proposal.title}</h2>
-                  <div className="flex items-center gap-4 text-sm text-black">
-                    <span>Author: <strong>{proposal.author}</strong></span>
+                  <div className="flex items-center gap-4 text-sm text-gray-800">
+                    <span>Author: <strong className="text-gray-900">{proposal.author}</strong></span>
                     <span>•</span>
-                    <span>Domain: <strong>{proposal.domain}</strong></span>
+                    <span>Domain: <strong className="text-gray-900">{proposal.domain}</strong></span>
                     <span>•</span>
                     <span className={`px-2 py-1 rounded-full text-xs font-bold ${
                       proposal.status === 'under_collaborative_review' 
@@ -581,33 +635,43 @@ function CollaborateContent() {
               </div>
               
               {/* Active Collaborators */}
-              <div className="flex items-center gap-3 mb-4">
-                <span className="text-sm font-semibold text-black">Active Collaborators:</span>
-                {proposal.collaborators?.map((collaborator, index) => (
-                  <div key={index} className="flex items-center gap-2">
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${
-                      collaborator.role === 'Principal Investigator' ? 'bg-blue-600' :
-                      collaborator.role === 'Technical Reviewer' ? 'bg-purple-600' :
-                      collaborator.role === 'Research Coordinator' ? 'bg-green-600' :
-                      'bg-gray-600'
-                    }`}>
-                      {collaborator.name.charAt(0)}
-                    </div>
-                    <div className="text-xs">
-                      <div className="font-semibold text-black">{collaborator.name}</div>
-                      <div className={`flex items-center gap-1 ${
-                        collaborator.status === 'online' ? 'text-green-600' :
-                        collaborator.status === 'away' ? 'text-yellow-600' : 'text-gray-400'
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-3">
+                  <span className="text-sm font-bold text-gray-900">Active Collaborators:</span>
+                  {proposal.collaborators?.map((collaborator, index) => (
+                    <div key={index} className="flex items-center gap-2">
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${
+                        collaborator.role === 'Principal Investigator' ? 'bg-blue-600' :
+                        collaborator.role === 'Technical Reviewer' ? 'bg-purple-600' :
+                        collaborator.role === 'Research Coordinator' ? 'bg-green-600' :
+                        'bg-gray-600'
                       }`}>
-                        <div className={`w-2 h-2 rounded-full ${
-                          collaborator.status === 'online' ? 'bg-green-500' :
-                          collaborator.status === 'away' ? 'bg-yellow-500' : 'bg-gray-400'
-                        }`}></div>
-                        {collaborator.status}
+                        {collaborator.name.charAt(0)}
+                      </div>
+                      <div className="text-xs">
+                        <div className="font-bold text-gray-900">{collaborator.name}</div>
+                        <div className={`flex items-center gap-1 text-xs font-semibold ${
+                          collaborator.status === 'online' ? 'text-green-700' :
+                          collaborator.status === 'away' ? 'text-yellow-700' : 'text-gray-600'
+                        }`}>
+                          <div className={`w-2 h-2 rounded-full ${
+                            collaborator.status === 'online' ? 'bg-green-500' :
+                            collaborator.status === 'away' ? 'bg-yellow-500' : 'bg-gray-400'
+                          }`}></div>
+                          {collaborator.status}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+                <button
+                  onClick={() => setShowInviteModal(true)}
+                  className="bg-orange-600 hover:bg-orange-700 text-white px-3 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-1"
+                  title="Invite new collaborator"
+                >
+                  <span className="text-lg">+</span>
+                  Add Member
+                </button>
               </div>
             </div>
 
@@ -629,27 +693,27 @@ function CollaborateContent() {
                 </div>
                 
                 {/* Inline Comments & AI Suggestions Panel */}
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                  <h4 className="font-semibold text-black mb-3">Comments & AI Suggestions</h4>
-                  <div className="space-y-2 max-h-32 overflow-y-auto">
+                <div className="mb-4 p-4 bg-white rounded-lg border-2 border-gray-300 shadow-md">
+                  <h4 className="font-bold text-gray-900 mb-4 text-lg">💬 Comments & AI Suggestions</h4>
+                  <div className="space-y-4 max-h-48 overflow-y-auto">{/* scrollbar styling will be handled by CSS */}
                     {inlineComments.map((comment) => (
-                      <div key={comment.id} className={`p-2 rounded text-xs ${
+                      <div key={comment.id} className={`p-4 rounded-lg text-sm border-2 shadow-sm ${
                         comment.type === 'ai_suggestion' 
-                          ? 'bg-purple-100 border-l-2 border-purple-500' 
-                          : 'bg-blue-100 border-l-2 border-blue-500'
+                          ? 'bg-purple-50 border-purple-300' 
+                          : 'bg-blue-50 border-blue-300'
                       }`}>
-                        <div className="flex justify-between items-start mb-1">
-                          <span className="font-semibold">
+                        <div className="flex justify-between items-start mb-2">
+                          <span className="font-bold text-gray-900 text-base">
                             {comment.type === 'ai_suggestion' 
                               ? `🤖 AI: ${comment.category}` 
                               : `${comment.author} (${comment.role})`}
                           </span>
-                          <span className="text-gray-500">{comment.timestamp}</span>
+                          <span className="text-gray-700 text-xs font-semibold">{comment.timestamp}</span>
                         </div>
-                        <p className="text-black">{comment.text}</p>
+                        <p className="text-gray-900 leading-relaxed font-medium">{comment.text}</p>
                         {comment.confidence && (
-                          <div className="mt-1">
-                            <span className="text-xs text-gray-600">Confidence: {comment.confidence}%</span>
+                          <div className="mt-2">
+                            <span className="text-xs text-purple-700 font-semibold">Confidence: {comment.confidence}%</span>
                           </div>
                         )}
                       </div>
@@ -740,11 +804,11 @@ function CollaborateContent() {
               </div>
               
               {/* Document Stats */}
-              <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
-                <div className="flex items-center gap-6 text-sm text-black">
-                  <span><strong>Words: {wordCount}</strong></span>
-                  <span><strong>Characters: {characterCount}</strong></span>
-                  <span className="text-green-600">✓ Auto-saved: 2 min ago</span>
+                <div className="flex justify-between items-center mt-4 pt-4 border-t border-gray-200">
+                <div className="flex items-center gap-6 text-sm text-gray-800">
+                  <span><strong className="text-gray-900">Words: {wordCount}</strong></span>
+                  <span><strong className="text-gray-900">Characters: {characterCount}</strong></span>
+                  <span className="text-green-700 font-semibold">✓ Auto-saved: 2 min ago</span>
                 </div>
                 <button
                   className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
@@ -765,18 +829,24 @@ function CollaborateContent() {
                   <h3 className="text-lg font-bold text-blue-900 mb-4">📊 Version History</h3>
                   <div className="space-y-3">
                     {versionHistory.map((version) => (
-                      <div key={version.id} className="border border-gray-200 rounded-lg p-3">
+                      <div key={version.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
                         <div className="flex justify-between items-start mb-2">
-                          <span className="font-semibold text-black">v{version.version}</span>
-                          <span className="text-xs text-gray-500">{version.timestamp}</span>
+                          <span className="font-bold text-gray-900">v{version.version}</span>
+                          <span className="text-xs text-gray-600">{version.timestamp}</span>
                         </div>
-                        <p className="text-sm text-black mb-2">{version.changes}</p>
+                        <p className="text-sm text-gray-800 mb-3 leading-relaxed">{version.changes}</p>
                         <div className="flex items-center gap-2">
                           <div className="w-6 h-6 bg-blue-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
                             {version.author.charAt(0)}
                           </div>
-                          <span className="text-xs text-black font-semibold">{version.author}</span>
+                          <span className="text-xs text-gray-900 font-bold">{version.author}</span>
                         </div>
+                        {version.collaborators && version.collaborators.length > 0 && (
+                          <div className="mt-2 pt-2 border-t border-gray-200">
+                            <span className="text-xs text-gray-600">Collaborators: </span>
+                            <span className="text-xs text-gray-800 font-semibold">{version.collaborators.join(', ')}</span>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -792,20 +862,20 @@ function CollaborateContent() {
                   <div className="p-4">
                     <div className="space-y-3 mb-4 max-h-80 overflow-y-auto">
                       {messages.map((message) => (
-                        <div key={message.id} className="flex gap-3">
+                        <div key={message.id} className="flex gap-3 p-3 bg-gray-50 rounded-lg">
                           <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-bold ${
                             message.sender === 'Dr. Sarah Chen' ? 'bg-blue-600' :
-                            message.sender === 'Prof. Michael Kumar' ? 'bg-purple-600' :
+                            message.sender === 'Prof. Michael Chen' ? 'bg-purple-600' :
                             message.sender === 'AI Assistant' ? 'bg-green-600' : 'bg-gray-600'
                           }`}>
                             {message.sender === 'AI Assistant' ? '🤖' : message.sender.charAt(0)}
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="font-semibold text-black text-sm">{message.sender}</span>
-                              <span className="text-xs text-gray-500">{message.time}</span>
+                              <span className="font-bold text-gray-900 text-sm">{message.sender}</span>
+                              <span className="text-xs text-gray-600">{message.time}</span>
                             </div>
-                            <p className="text-sm text-black">{message.content}</p>
+                            <p className="text-sm text-gray-800 leading-relaxed">{message.content}</p>
                           </div>
                         </div>
                       ))}
@@ -917,6 +987,86 @@ function CollaborateContent() {
           border-radius: 3px;
         }
       `}</style>
+
+      {/* Collaboration Invitation Modal */}
+      {showInviteModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4">
+            <div className="bg-orange-600 text-white p-4 rounded-t-lg">
+              <div className="flex justify-between items-center">
+                <h3 className="text-lg font-bold">📧 Invite Collaborator</h3>
+                <button
+                  onClick={() => setShowInviteModal(false)}
+                  className="text-white hover:text-gray-200 text-xl"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+            <div className="p-6">
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Email Address *
+                </label>
+                <input
+                  type="email"
+                  value={inviteEmail}
+                  onChange={(e) => setInviteEmail(e.target.value)}
+                  placeholder="colleague@example.com"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-black"
+                  required
+                />
+              </div>
+              
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Role
+                </label>
+                <select
+                  value={inviteRole}
+                  onChange={(e) => setInviteRole(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-black"
+                >
+                  <option value="Research Collaborator">Research Collaborator</option>
+                  <option value="Technical Reviewer">Technical Reviewer</option>
+                  <option value="Research Coordinator">Research Coordinator</option>
+                  <option value="Environmental Specialist">Environmental Specialist</option>
+                  <option value="Data Analyst">Data Analyst</option>
+                </select>
+              </div>
+              
+              <div className="mb-6">
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Personal Message (Optional)
+                </label>
+                <textarea
+                  value={inviteMessage}
+                  onChange={(e) => setInviteMessage(e.target.value)}
+                  placeholder="Add a personal message to the invitation..."
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-black resize-none"
+                />
+              </div>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setShowInviteModal(false)}
+                  className="flex-1 px-4 py-2 border-2 border-red-500 text-white bg-red-500 rounded-lg hover:bg-red-600 hover:border-red-600 font-semibold transition-all duration-200 shadow-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleSendInvitation}
+                  disabled={!inviteEmail.trim() || !isValidEmail(inviteEmail)}
+                  className="flex-1 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold shadow-md"
+                >
+                  Send Invitation
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

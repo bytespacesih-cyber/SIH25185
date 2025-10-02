@@ -346,11 +346,11 @@ function ViewProposalContent() {
           
           {/* Read-only Document Viewer */}
           <div className="prose max-w-none">
-            <div className="border border-gray-300 rounded-md min-h-[600px] p-6 bg-gray-50">
+            <div className="border border-gray-300 rounded-md min-h-[600px] p-6 bg-white">
               <div 
-                className="focus:outline-none min-h-[550px] text-black"
+                className="focus:outline-none min-h-[550px] text-black proposal-content"
                 dangerouslySetInnerHTML={{ __html: proposal.richContent }}
-                style={{ color: 'black' }}
+                style={{ color: 'black !important' }}
               />
             </div>
           </div>
@@ -436,6 +436,60 @@ function ViewProposalContent() {
           </button>
         </div>
       </div>
+
+      {/* Proposal Content Styling */}
+      <style jsx global>{`
+        .proposal-content * {
+          color: black !important;
+        }
+        
+        .proposal-content h1,
+        .proposal-content h2,
+        .proposal-content h3,
+        .proposal-content h4,
+        .proposal-content h5,
+        .proposal-content h6 {
+          color: black !important;
+          font-weight: bold !important;
+        }
+        
+        .proposal-content p {
+          color: black !important;
+          line-height: 1.6 !important;
+          margin-bottom: 1em !important;
+        }
+        
+        .proposal-content ul,
+        .proposal-content ol {
+          color: black !important;
+          margin-bottom: 1.5em !important;
+        }
+        
+        .proposal-content li {
+          color: black !important;
+          margin-bottom: 0.5em !important;
+        }
+        
+        .proposal-content table {
+          color: black !important;
+          border-collapse: collapse !important;
+          width: 100% !important;
+          margin: 1.5em 0 !important;
+        }
+        
+        .proposal-content th,
+        .proposal-content td {
+          color: black !important;
+          border: 1px solid #d1d5db !important;
+          padding: 12px !important;
+          text-align: left !important;
+        }
+        
+        .proposal-content th {
+          background-color: #f3f4f6 !important;
+          font-weight: bold !important;
+        }
+      `}</style>
     </div>
   );
 }
