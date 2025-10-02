@@ -630,7 +630,7 @@ export default function Profile() {
                 </button>
                 <button 
                   onClick={() => window.print()}
-                  className="w-full p-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all duration-300"
+                  className="w-full p-3 bg-black hover:bg-gray-200 text-gray-700 rounded-xl font-semibold transition-all duration-300"
                 >
                   Print Profile
                 </button>
