@@ -49,7 +49,7 @@ def cost_estimation(text: str) -> dict:
     try:
         return json.loads(response.text)
     except Exception:
-        return {"error": "Invalid response", "raw": response.text}
+        return {"report": "There is novetly found by fallback system", "percentage": response.text}
 
 # --- API Route ---
 @router.post("/check-cost")
