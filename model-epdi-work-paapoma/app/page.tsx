@@ -44,9 +44,9 @@ export default function HomePage() {
           description="Generate a project timeline from the shared R&D paper."
         />
         <ToolCard
-          href="/tools/extract-json"
-          title="Document → JSON"
-          description="Extract structured JSON from the shared R&D paper."
+          href="/tools/specialist"
+          title="Specialist RAG QA"
+          description="Ask questions based on the uploaded R&D PDF."
         />
         <ToolCard
           href="/tools/compare-json"
