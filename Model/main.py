@@ -23,15 +23,15 @@ app.add_middleware(
 )
 
 # Include all routers
-app.include_router(timeline.router, prefix="/api")
-app.include_router(similarity_checker.router, prefix="/api")
-app.include_router(rag_chat_guidlines.router, prefix="/api")
-app.include_router(rag_chat_specialist.router, prefix="/api")
-app.include_router(extractor.router, prefix="/api")
-app.include_router(novelty.router, prefix="/api")
-app.include_router(cost.router, prefix="/api")
-app.include_router(plag.router, prefix="/api")
-app.include_router(online_checker.app, prefix="/api")
+app.include_router(timeline.router)
+app.include_router(similarity_checker.router)
+app.include_router(rag_chat_guidlines.router)
+app.include_router(rag_chat_specialist.router)
+app.include_router(extractor.router)
+app.include_router(novelty.router)
+app.include_router(cost.router)
+app.include_router(plag.router)
+app.include_router(online_checker.app)
 # -----------------------------
 # Run FastAPI directly with Python
 # -----------------------------
