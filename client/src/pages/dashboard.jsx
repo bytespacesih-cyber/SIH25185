@@ -3,6 +3,7 @@ import { useAuth, ROLES } from "../context/AuthContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 import LoadingScreen from "../components/LoadingScreen";
 import Link from "next/link";
+import { API_ENDPOINTS, getProposalUrl } from "../utils/api";
 
 // Counter animation component
 const AnimatedCounter = ({ targetValue, duration = 2000 }) => {
@@ -52,7 +53,7 @@ function DashboardContent() {
       
       try {
         const token = localStorage.getItem("token");
-        let endpoint = "http://localhost:5000/api/proposals";
+        let endpoint = API_ENDPOINTS.PROPOSALS;
         
         // Different endpoints based on role
         if (isUser()) {
@@ -158,7 +159,7 @@ function DashboardContent() {
   const handleStatusUpdate = async (proposalId, newStatus) => {
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/proposals/${proposalId}/status`, {
+      const response = await fetch(getProposalUrl(proposalId, 'status'), {
         method: 'PATCH',
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -192,7 +193,7 @@ function DashboardContent() {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await fetch(`http://localhost:5000/api/proposals/${proposalId}/assign`, {
+      const response = await fetch(getProposalUrl(proposalId, 'assign'), {
         method: 'PATCH',
         headers: {
           "Authorization": `Bearer ${token}`,
