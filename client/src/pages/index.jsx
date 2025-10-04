@@ -421,7 +421,6 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-center text-white mb-8 animate-fade-in-up border-b-4 border-yellow-500 pb-4 inline-block">Our Ministers</h2>
-            
           </div>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
