@@ -198,17 +198,6 @@ export default function Home() {
                     Create Account
                   </button>
                 </Link>
-                <button 
-                  onClick={() => setShowCollaborateModal(true)}
-                  className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white px-6 py-4 rounded-md font-bold text-lg transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-2 border-2 border-green-400 hover:border-green-300 animate-pulse"
-                >
-                  <div className="bg-white rounded-full p-1">
-                    <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </div>
-                  <span className="font-extrabold">Collaborate</span>
-                </button>
               </div>
             </div>
 
