@@ -15,7 +15,7 @@ export default function Home() {
     "/images/banner image.jpg", // Default image (first)
     "/images/aatai1.jpeg",
     "/images/aatai2.png",
-    "/images/sibi.png"
+    "/images/Sibi.png"
   ];
 
   // Auto-switch images every 4 seconds
