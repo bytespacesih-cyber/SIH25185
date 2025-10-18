@@ -112,6 +112,7 @@ export default function Navbar({ variant = "default" }) {
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-10 -right-10 w-32 h-32 bg-white/10 rounded-full animate-float"></div>
+
           <div className="absolute top-0 -left-5 w-24 h-24 bg-white/5 rounded-full animate-float animation-delay-1000"></div>
         </div>
 
@@ -122,6 +123,7 @@ export default function Navbar({ variant = "default" }) {
               <div className="flex items-center gap-6 cursor-pointer group">
                 {/* Government Section */}
                 <div className={`flex items-center gap-4 text-sm font-semibold ${navStyles.text}`}>
+                  <div className="pl-10">SIH TEAM ID : 72110</div>
                   <a href="https://www.india.gov.in/" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 px-2 py-1 rounded transition-colors ${
                     variant === "profile" ? 'hover:bg-white/20' : (isScrolled ? 'hover:bg-white/10' : 'hover:bg-black/20')
                   }`}>
@@ -337,7 +339,7 @@ export default function Navbar({ variant = "default" }) {
                 // Guest navigation
                 <div className="flex items-center gap-4">
                   <Link href="/login">
-                    <button className={`group px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105 ${
+                    <button className={`group min-w-[120px] md:min-w-[140px] px-4 md:px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 ${
                       isScrolled 
                         ? 'bg-gradient-to-r from-orange-700 to-orange-800 hover:from-orange-800 hover:to-orange-900 text-white shadow-lg' 
                         : 'bg-gray-900 hover:bg-gray-800 text-white shadow-lg'
@@ -349,7 +351,7 @@ export default function Navbar({ variant = "default" }) {
                     </button>
                   </Link>
                   <Link href="/register">
-                    <button className={`group border-2 px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105 ${
+                    <button className={`group border-2 min-w-[110px] md:min-w-[130px] px-4 md:px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 ${
                       isScrolled 
                         ? 'border-orange-700 hover:border-orange-800 text-orange-800 hover:bg-orange-700/10 bg-white/90' 
                         : 'border-gray-900 hover:border-gray-700 text-gray-900 hover:bg-gray-900/20 shadow-md'
