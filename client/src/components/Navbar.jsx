@@ -118,12 +118,13 @@ export default function Navbar({ variant = "default" }) {
 
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
+            {/* (SIH ID badge moved near right controls) */}
             {/* Combined Government & Logo Section */}
             <Link href={user ? "/dashboard" : "/"}>
               <div className="flex items-center gap-6 cursor-pointer group">
                 {/* Government Section */}
                 <div className={`flex items-center gap-4 text-sm font-semibold ${navStyles.text}`}>
-                  <div className="pl-10">SIH TEAM ID : 72110</div>
+                  {/* SIH TEAM ID moved to corner badge */}
                   <a href="https://www.india.gov.in/" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 px-2 py-1 rounded transition-colors ${
                     variant === "profile" ? 'hover:bg-white/20' : (isScrolled ? 'hover:bg-white/10' : 'hover:bg-black/20')
                   }`}>
@@ -339,7 +340,7 @@ export default function Navbar({ variant = "default" }) {
                 // Guest navigation
                 <div className="flex items-center gap-4">
                   <Link href="/login">
-                    <button className={`group min-w-[120px] md:min-w-[140px] px-4 md:px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 ${
+                    <button className={`group px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105 ${
                       isScrolled 
                         ? 'bg-gradient-to-r from-orange-700 to-orange-800 hover:from-orange-800 hover:to-orange-900 text-white shadow-lg' 
                         : 'bg-gray-900 hover:bg-gray-800 text-white shadow-lg'
@@ -351,7 +352,7 @@ export default function Navbar({ variant = "default" }) {
                     </button>
                   </Link>
                   <Link href="/register">
-                    <button className={`group border-2 min-w-[110px] md:min-w-[130px] px-4 md:px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center justify-center gap-2 hover:scale-105 ${
+                    <button className={`group border-2 px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105 ${
                       isScrolled 
                         ? 'border-orange-700 hover:border-orange-800 text-orange-800 hover:bg-orange-700/10 bg-white/90' 
                         : 'border-gray-900 hover:border-gray-700 text-gray-900 hover:bg-gray-900/20 shadow-md'
@@ -364,6 +365,18 @@ export default function Navbar({ variant = "default" }) {
                   </Link>
                 </div>
               )}
+              </div>
+            </div>
+
+            {/* Badge placed to the right of the right-section (appears on md+ screens) */}
+            <div className="hidden md:flex items-center pl-2">
+              <div
+                className="px-3 py-1 rounded-full bg-black text-white text-xs font-semibold shadow-lg border border-white/10 ml-2"
+                role="status"
+                aria-label="SIH Team ID 72110"
+                title="SIH Team ID: 72110"
+              >
+                SIH ID: 72110
               </div>
             </div>
 
