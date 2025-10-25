@@ -888,24 +888,6 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 - **Backend:** ESLint (Standard config)
 - **Python:** PEP 8 (Black formatter)
 
----
-
-## 👨‍💻 Team
-
-**Team Name:** [Your Team Name]
-
-| Role | Name | LinkedIn | GitHub |
-|------|------|----------|--------|
-| Team Lead | [Name] | [Profile] | [Username] |
-| Full Stack Developer | [Name] | [Profile] | [Username] |
-| AI/ML Engineer | [Name] | [Profile] | [Username] |
-| Frontend Developer | [Name] | [Profile] | [Username] |
-| Backend Developer | [Name] | [Profile] | [Username] |
-| UI/UX Designer | [Name] | [Profile] | [Username] |
-
-**Mentors:** [Mentor Names]
-
-**Institution:** [Your College/Organization]
 
 ---
 
