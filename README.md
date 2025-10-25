@@ -216,6 +216,10 @@ Unlike generic document management systems, our platform handles:
 
 ---
 
+## Technical Architecture
+
+<img src="assets/arch-diag.jpg" alt="architecture-diagram" width="800"/>
+
 ## 🌱 Environmental & Social Impact
 
 ### Direct Environmental Benefits
