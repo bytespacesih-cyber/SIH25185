@@ -4,7 +4,7 @@
 ### *AI-Powered Research Proposal Management System*
 
 <img src="assets/sih-logo.png" alt="Smart India Hackathon 2025" width="200"/>
-<img src="assets/team-logo.png" alt="Team Logo" width="200"/>
+<img src="assets/tem-logo.png" alt="Team Logo" width="200"/>
 
 **Smart India Hackathon 2025 | Problem Statement ID: SIH25180**
 
