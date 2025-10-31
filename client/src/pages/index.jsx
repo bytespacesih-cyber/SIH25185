@@ -766,7 +766,7 @@ export default function Home() {
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                         </svg>
-                        <span className="text-sm">Coal Research Lab</span>
+                        <span className="text-sm">Research Lab</span>
                       </div>
                       <div className="flex items-center gap-1 text-sm">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -814,7 +814,7 @@ export default function Home() {
                 <div className="relative group cursor-pointer hover:transform hover:scale-105 transition-transform">
                   <div className="w-full h-80 bg-gradient-to-br from-green-100 to-green-200 rounded-lg overflow-hidden">
                     <img 
-                      src="/images/coal image3.jpg" 
+                      src="/images/north.png" 
                       alt="Environmental Research"
                       className="w-full h-full object-cover"
                     />
@@ -884,7 +884,7 @@ export default function Home() {
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                         </svg>
-                        <span className="text-sm">Mining Operations</span>
+                        <span className="text-sm">Research Operations</span>
                       </div>
                       <div className="flex items-center gap-1 text-sm">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -900,8 +900,8 @@ export default function Home() {
                 <div className="relative group cursor-pointer hover:transform hover:scale-105 transition-transform">
                   <div className="w-full h-80 bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg overflow-hidden">
                     <img 
-                      src="/images/another coal mining image.jpg" 
-                      alt="Coal Mining Site"
+                      src="/images/north.png" 
+                      alt="Norhthern Region"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -911,7 +911,7 @@ export default function Home() {
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                           <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
                         </svg>
-                        <span className="text-sm">Mining Site</span>
+                        <span className="text-sm">Northern Region</span>
                       </div>
                       <div className="flex items-center gap-1 text-sm">
                         <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -928,14 +928,14 @@ export default function Home() {
 
             {/* Additional Gallery Items */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="h-40 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform cursor-pointer">
+              <div className="h-50 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg overflow-hidden hover:transform hover:scale-105 transition-transform cursor-pointer">
                 <img 
-                  src="/images/coal mining image2.jpeg" 
+                  src="/images/north.png" 
                   alt="Mining Technology"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-[50%_20%]"
                 />
               </div>
-              <div className="h-40 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center hover:transform hover:scale-105 transition-transform cursor-pointer">
+              <div className="h-50 bg-gradient-to-br from-green-100 to-green-200 rounded-lg flex items-center justify-center hover:transform hover:scale-105 transition-transform cursor-pointer">
                 <div className="text-center text-green-600">
                   <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
@@ -943,7 +943,7 @@ export default function Home() {
                   <div className="text-sm font-medium">Project Reports</div>
                 </div>
               </div>
-              <div className="h-40 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center hover:transform hover:scale-105 transition-transform cursor-pointer">
+              <div className="h-50 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg flex items-center justify-center hover:transform hover:scale-105 transition-transform cursor-pointer">
                 <div className="text-center text-purple-600">
                   <svg className="w-12 h-12 mx-auto mb-2" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
