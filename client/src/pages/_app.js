@@ -23,16 +23,16 @@ export default function MyApp({ Component, pageProps }) {
 
   return (
     <>
-      {/* Google Analytics - Measurement ID: G-9RT2VW4QSM */}
+      {/* Google Analytics - Measurement ID: G-DSVG4LRY6J */}
       <Script
-        src="https://www.googletagmanager.com/gtag/js?id=G-9RT2VW4QSM"
+        src="https://www.googletagmanager.com/gtag/js?id=G-DSVG4LRY6J"
         strategy="afterInteractive"
       />
       <Script id="gtag-init" strategy="afterInteractive">
         {`window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);} 
 gtag('js', new Date());
-gtag('config', 'G-9RT2VW4QSM', { page_path: window.location.pathname });`}
+gtag('config', 'G-DSVG4LRY6J', { page_path: window.location.pathname });`}
       </Script>
     <AuthProvider>
       <Component {...pageProps} />
