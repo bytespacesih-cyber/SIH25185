@@ -163,13 +163,13 @@ export default function Home() {
                 <div className="flex items-center justify-center lg:justify-start gap-4">
                   <div className="w-20 h-20 bg-white rounded-lg flex items-center justify-center overflow-hidden shadow-md border">
                     <img 
-                      src="/images/neuro_1.png" 
-                      alt="NEURO Logo" 
+                      src="/images/neura.png" 
+                      alt="NEURA Logo" 
                       className="w-full h-full object-contain p-2"
                     />
                   </div>
                   <div className="text-left">
-                    <h2 className="text-2xl font-bold text-black mb-2">NEURO</h2>
+                    <h2 className="text-2xl font-bold text-black mb-2">NEURA</h2>
                     <p className="text-sm text-black font-medium">
                       Neural Evaluation and 
                       Unified Review Architecture
