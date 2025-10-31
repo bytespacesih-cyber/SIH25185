@@ -3,7 +3,6 @@ import { useAuth, ROLES } from "../context/AuthContext";
 import ProtectedRoute from "../components/ProtectedRoute";
 import LoadingScreen from "../components/LoadingScreen";
 import Link from "next/link";
-import { API_ENDPOINTS, getProposalUrl } from "../utils/api";
 
 // Counter animation component
 const AnimatedCounter = ({ targetValue, duration = 2000 }) => {
@@ -37,9 +36,6 @@ const AnimatedCounter = ({ targetValue, duration = 2000 }) => {
   return <span>{count}</span>;
 };
 
-// Team : ByteSpace 
-// SIH Team ID : 72110
-
 function DashboardContent() {
   const { user, logout, isUser, isReviewer, isStaff } = useAuth();
   const [proposals, setProposals] = useState([]);
@@ -56,7 +52,7 @@ function DashboardContent() {
       
       try {
         const token = localStorage.getItem("token");
-        let endpoint = API_ENDPOINTS.PROPOSALS;
+        let endpoint = "http://localhost:5000/api/proposals";
         
         // Different endpoints based on role
         if (isUser()) {
@@ -77,185 +73,7 @@ function DashboardContent() {
         if (response.ok) {
           const data = await response.json();
           console.log(data);
-          const proposals = Array.isArray(data.proposals) ? data.proposals : [];
-          
-          // For reviewers, if no proposals from API, use sample data for demo
-          if (isReviewer() && proposals.length === 0) {
-            console.log("No proposals from API, using sample data for reviewer");
-            setProposals([
-              { 
-                id: 1, 
-                title: "Clean Coal Technology for Reduced Emissions", 
-                description: "Development of advanced clean coal technology to minimize environmental impact while maintaining energy efficiency. Focus on carbon capture and storage (CCS) integration.",
-                status: "under_review", 
-                author: "Dr. Rajesh Kumar", 
-                email: "rajesh.kumar@cmpdi.co.in",
-                domain: "Clean Coal Technology",
-                budget: 2500000,
-                duration: "24 months",
-                institution: "Central Mine Planning & Design Institute",
-                createdAt: "2025-10-01T10:00:00Z",
-                submissionDate: "2025-10-01",
-                assignedStaff: null,
-                priority: "High",
-                fundingAgency: "Ministry of Coal",
-                collaborators: ["IIT Delhi", "TERI"],
-                keywords: ["clean coal", "carbon capture", "emissions reduction"],
-                abstract: "This research aims to develop next-generation clean coal technologies that can significantly reduce greenhouse gas emissions while maintaining economic viability of coal-based power generation.",
-                expectedOutcomes: ["50% reduction in CO2 emissions", "Improved energy efficiency", "Commercial viability assessment"]
-              },
-              { 
-                id: 2, 
-                title: "AI-Based Coal Quality Assessment System", 
-                description: "Implementation of artificial intelligence and machine learning algorithms for real-time coal quality assessment and grading in mining operations.",
-                status: "assigned_to_staff", 
-                author: "Dr. Priya Sharma", 
-                email: "priya.sharma@coalindia.in",
-                domain: "Digital Mining Technology",
-                budget: 1800000,
-                duration: "18 months",
-                institution: "Coal India Limited R&D Centre",
-                createdAt: "2025-09-28T14:30:00Z",
-                submissionDate: "2025-09-28",
-                assignedStaff: "Mr. Anil Verma",
-                priority: "Medium",
-                fundingAgency: "Coal India Limited",
-                collaborators: ["IIT Kharagpur", "ISM Dhanbad"],
-                keywords: ["artificial intelligence", "coal quality", "automated assessment"],
-                abstract: "Developing an AI-powered system for automated coal quality assessment using computer vision and machine learning to improve efficiency and accuracy in coal grading processes.",
-                expectedOutcomes: ["95% accuracy in quality assessment", "30% reduction in assessment time", "Standardized grading protocol"]
-              },
-              { 
-                id: 3, 
-                title: "Sustainable Mining Waste Management", 
-                description: "Research on innovative approaches for managing coal mining waste through circular economy principles and environmental restoration techniques.",
-                status: "approved", 
-                author: "Prof. Vikram Singh", 
-                email: "vikram.singh@ismdhanbad.ac.in",
-                domain: "Environmental Mining",
-                budget: 3200000,
-                duration: "36 months",
-                institution: "Indian Institute of Technology (ISM) Dhanbad",
-                createdAt: "2025-09-25T09:15:00Z",
-                submissionDate: "2025-09-25",
-                assignedStaff: "Dr. Meera Patel",
-                priority: "High",
-                fundingAgency: "Department of Science & Technology",
-                collaborators: ["CSIR-CIMFR", "NEERI"],
-                keywords: ["waste management", "circular economy", "environmental restoration"],
-                abstract: "Comprehensive study on converting coal mining waste into useful materials while implementing environmental restoration techniques for sustainable mining practices.",
-                expectedOutcomes: ["Zero-waste mining model", "Land restoration protocol", "Commercial waste utilization"]
-              },
-              { 
-                id: 4, 
-                title: "Underground Coal Gasification Technology", 
-                description: "Advanced research on underground coal gasification (UCG) for clean energy production with minimal surface environmental impact.",
-                status: "under_review", 
-                author: "Dr. Suresh Reddy", 
-                email: "suresh.reddy@ongc.co.in",
-                domain: "Advanced Energy Systems",
-                budget: 4500000,
-                duration: "42 months",
-                institution: "Oil and Natural Gas Corporation",
-                createdAt: "2025-09-30T16:45:00Z",
-                submissionDate: "2025-09-30",
-                assignedStaff: null,
-                priority: "High",
-                fundingAgency: "Ministry of Petroleum & Natural Gas",
-                collaborators: ["ONGC Energy Centre", "IIT Bombay"],
-                keywords: ["underground gasification", "clean energy", "minimal impact"],
-                abstract: "Development of underground coal gasification technology for producing synthetic gas while minimizing surface environmental disruption and maximizing energy recovery.",
-                expectedOutcomes: ["Pilot UCG plant", "Environmental impact assessment", "Economic feasibility study"]
-              },
-              { 
-                id: 5, 
-                title: "Coal Mine Safety Enhancement using IoT", 
-                description: "Implementation of Internet of Things (IoT) sensors and real-time monitoring systems to enhance safety protocols in underground coal mining operations.",
-                status: "pending", 
-                author: "Engr. Amit Joshi", 
-                email: "amit.joshi@secl.co.in",
-                domain: "Mining Safety Technology",
-                budget: 2100000,
-                duration: "30 months",
-                institution: "South Eastern Coalfields Limited",
-                createdAt: "2025-10-02T11:20:00Z",
-                submissionDate: "2025-10-02",
-                assignedStaff: null,
-                priority: "Medium",
-                fundingAgency: "Ministry of Coal",
-                collaborators: ["NIT Raipur", "CIMFR"],
-                keywords: ["IoT sensors", "mine safety", "real-time monitoring"],
-                abstract: "Deployment of comprehensive IoT-based monitoring system for real-time tracking of environmental conditions, equipment status, and personnel safety in underground mines.",
-                expectedOutcomes: ["Real-time safety monitoring", "Predictive maintenance system", "Emergency response automation"]
-              },
-              { 
-                id: 6, 
-                title: "Coal Bed Methane Extraction Optimization", 
-                description: "Research on enhanced coal bed methane (CBM) extraction techniques using advanced drilling technologies and reservoir stimulation methods.",
-                status: "rejected", 
-                author: "Dr. Kavitha Naidu", 
-                email: "kavitha.naidu@ril.com",
-                domain: "Reservoir Engineering",
-                budget: 3800000,
-                duration: "48 months",
-                institution: "Reliance Industries Limited",
-                createdAt: "2025-09-20T13:30:00Z",
-                submissionDate: "2025-09-20",
-                assignedStaff: "Dr. Rahul Gupta",
-                priority: "Low",
-                fundingAgency: "Ministry of Petroleum & Natural Gas",
-                collaborators: ["ONGC", "Cairn Energy"],
-                keywords: ["coal bed methane", "extraction optimization", "reservoir stimulation"],
-                abstract: "Optimization of coal bed methane extraction through advanced horizontal drilling techniques and enhanced reservoir stimulation for increased gas recovery rates.",
-                expectedOutcomes: ["Enhanced extraction rates", "Cost reduction strategies", "Environmental impact minimization"],
-                rejectionReason: "Insufficient environmental impact assessment and limited innovation over existing methods."
-              },
-              { 
-                id: 7, 
-                title: "Renewable Energy Integration in Mining Operations", 
-                description: "Development of hybrid renewable energy systems for coal mining operations to reduce carbon footprint and operational costs.",
-                status: "under_review", 
-                author: "Dr. Sunita Agarwal", 
-                email: "sunita.agarwal@ntpc.co.in",
-                domain: "Renewable Energy",
-                budget: 5200000,
-                duration: "60 months",
-                institution: "National Thermal Power Corporation",
-                createdAt: "2025-09-27T08:45:00Z",
-                submissionDate: "2025-09-27",
-                assignedStaff: null,
-                priority: "High",
-                fundingAgency: "Ministry of New & Renewable Energy",
-                collaborators: ["NTPC Renewable", "Solar Energy Corporation"],
-                keywords: ["renewable energy", "mining operations", "carbon footprint"],
-                abstract: "Integration of solar and wind energy systems with existing coal mining infrastructure to create sustainable hybrid energy solutions for mining operations.",
-                expectedOutcomes: ["60% renewable energy integration", "Cost reduction analysis", "Replication model development"]
-              },
-              { 
-                id: 8, 
-                title: "Advanced Coal Preparation Technologies", 
-                description: "Research on innovative coal preparation and beneficiation techniques to improve coal quality and reduce ash content for better combustion efficiency.",
-                status: "approved", 
-                author: "Prof. Deepak Agrawal", 
-                email: "deepak.agrawal@bhu.ac.in",
-                domain: "Coal Processing",
-                budget: 2800000,
-                duration: "36 months",
-                institution: "Banaras Hindu University",
-                createdAt: "2025-09-22T15:10:00Z",
-                submissionDate: "2025-09-22",
-                assignedStaff: "Dr. Nisha Kapoor",
-                priority: "Medium",
-                fundingAgency: "University Grants Commission",
-                collaborators: ["CSIR-CIMFR", "BHU Mining Department"],
-                keywords: ["coal preparation", "beneficiation", "ash reduction"],
-                abstract: "Development of advanced coal preparation technologies using novel separation techniques to produce high-quality coal with reduced ash content and improved calorific value.",
-                expectedOutcomes: ["50% ash reduction", "Improved coal quality", "Energy-efficient processing"]
-              }
-            ]);
-          } else {
-            setProposals(proposals);
-          }
+          setProposals(Array.isArray(data.proposals) ? data.proposals : []);
         } else {
           console.log("API failed, using fallback data");
           // Enhanced fallback mock data based on role
@@ -263,213 +81,149 @@ function DashboardContent() {
             setProposals([
               { 
                 id: 1, 
-                title: "Clean Coal Technology for Reduced Emissions", 
-                description: "Development of advanced clean coal technology to minimize environmental impact while maintaining energy efficiency. Focus on carbon capture and storage (CCS) integration.",
+                title: "AI-Powered Coal Quality Assessment System", 
+                description: "Development of machine learning algorithms for real-time coal quality assessment and grading using computer vision and spectroscopic analysis.",
                 status: "under_review", 
                 author: "Dr. Rajesh Kumar", 
-                email: "rajesh.kumar@cmpdi.co.in",
-                domain: "Clean Coal Technology",
-                budget: 2500000,
-                duration: "24 months",
-                institution: "Central Mine Planning & Design Institute",
-                createdAt: "2025-10-01T10:00:00Z",
-                submissionDate: "2025-10-01",
+                domain: "Artificial Intelligence & Mining",
+                budget: 285000,
+                createdAt: "2025-09-25T10:00:00Z",
                 assignedStaff: null,
-                priority: "High",
-                fundingAgency: "Ministry of Coal",
-                collaborators: ["IIT Delhi", "TERI"],
-                keywords: ["clean coal", "carbon capture", "emissions reduction"],
-                abstract: "This research aims to develop next-generation clean coal technologies that can significantly reduce greenhouse gas emissions while maintaining economic viability of coal-based power generation.",
-                expectedOutcomes: ["50% reduction in CO2 emissions", "Improved energy efficiency", "Commercial viability assessment"]
+                aiScore: {
+                  overall: 87,
+                  technical: 92,
+                  feasibility: 85,
+                  innovation: 89,
+                  impact: 83,
+                  budget: 88,
+                  timeline: 84
+                },
+                submissionDate: "2025-09-25",
+                category: "Technology Innovation"
               },
               { 
                 id: 2, 
-                title: "AI-Based Coal Quality Assessment System", 
-                description: "Implementation of artificial intelligence and machine learning algorithms for real-time coal quality assessment and grading in mining operations.",
+                title: "Sustainable Coal Mining Waste Management", 
+                description: "Research on converting coal mining waste into useful construction materials using advanced chemical processing techniques.",
                 status: "assigned_to_staff", 
-                author: "Dr. Priya Sharma", 
-                email: "priya.sharma@coalindia.in",
-                domain: "Digital Mining Technology",
-                budget: 1800000,
-                duration: "18 months",
-                institution: "Coal India Limited R&D Centre",
-                createdAt: "2025-09-28T14:30:00Z",
-                submissionDate: "2025-09-28",
-                assignedStaff: "Mr. Anil Verma",
-                priority: "Medium",
-                fundingAgency: "Coal India Limited",
-                collaborators: ["IIT Kharagpur", "ISM Dhanbad"],
-                keywords: ["artificial intelligence", "coal quality", "automated assessment"],
-                abstract: "Developing an AI-powered system for automated coal quality assessment using computer vision and machine learning to improve efficiency and accuracy in coal grading processes.",
-                expectedOutcomes: ["95% accuracy in quality assessment", "30% reduction in assessment time", "Standardized grading protocol"]
+                author: "Prof. Priya Sharma", 
+                domain: "Environmental Technology",
+                budget: 195000,
+                createdAt: "2025-09-22T14:30:00Z",
+                assignedStaff: "Research Team Alpha",
+                aiScore: {
+                  overall: 93,
+                  technical: 90,
+                  feasibility: 95,
+                  innovation: 88,
+                  impact: 96,
+                  budget: 92,
+                  timeline: 91
+                },
+                submissionDate: "2025-09-22",
+                category: "Environmental Research"
               },
               { 
                 id: 3, 
-                title: "Sustainable Mining Waste Management", 
-                description: "Research on innovative approaches for managing coal mining waste through circular economy principles and environmental restoration techniques.",
+                title: "Advanced Coal Gasification Process Optimization", 
+                description: "Development of next-generation coal gasification technology with enhanced efficiency and reduced emissions using AI-driven process optimization.",
                 status: "approved", 
-                author: "Prof. Vikram Singh", 
-                email: "vikram.singh@ismdhanbad.ac.in",
-                domain: "Environmental Mining",
-                budget: 3200000,
-                duration: "36 months",
-                institution: "Indian Institute of Technology (ISM) Dhanbad",
-                createdAt: "2025-09-25T09:15:00Z",
-                submissionDate: "2025-09-25",
-                assignedStaff: "Dr. Meera Patel",
-                priority: "High",
-                fundingAgency: "Department of Science & Technology",
-                collaborators: ["CSIR-CIMFR", "NEERI"],
-                keywords: ["waste management", "circular economy", "environmental restoration"],
-                abstract: "Comprehensive study on converting coal mining waste into useful materials while implementing environmental restoration techniques for sustainable mining practices.",
-                expectedOutcomes: ["Zero-waste mining model", "Land restoration protocol", "Commercial waste utilization"]
+                author: "Dr. Michael Chen", 
+                domain: "Clean Coal Technology",
+                budget: 420000,
+                createdAt: "2025-09-20T09:15:00Z",
+                assignedStaff: "Advanced Research Unit",
+                aiScore: {
+                  overall: 91,
+                  technical: 94,
+                  feasibility: 87,
+                  innovation: 93,
+                  impact: 89,
+                  budget: 85,
+                  timeline: 90
+                },
+                submissionDate: "2025-09-20",
+                category: "Process Innovation"
               },
               { 
                 id: 4, 
-                title: "Underground Coal Gasification Technology", 
-                description: "Advanced research on underground coal gasification (UCG) for clean energy production with minimal surface environmental impact.",
+                title: "Digital Twin Technology for Mining Operations", 
+                description: "Implementation of comprehensive digital twin systems for coal mining operations to optimize production, safety, and equipment maintenance.",
                 status: "under_review", 
-                author: "Dr. Suresh Reddy", 
-                email: "suresh.reddy@ongc.co.in",
-                domain: "Advanced Energy Systems",
-                budget: 4500000,
-                duration: "42 months",
-                institution: "Oil and Natural Gas Corporation",
-                createdAt: "2025-09-30T16:45:00Z",
-                submissionDate: "2025-09-30",
+                author: "Dr. Sarah Williams", 
+                domain: "Digital Mining Technology",
+                budget: 350000,
+                createdAt: "2025-09-18T16:45:00Z",
                 assignedStaff: null,
-                priority: "High",
-                fundingAgency: "Ministry of Petroleum & Natural Gas",
-                collaborators: ["ONGC Energy Centre", "IIT Bombay"],
-                keywords: ["underground gasification", "clean energy", "minimal impact"],
-                abstract: "Development of underground coal gasification technology for producing synthetic gas while minimizing surface environmental disruption and maximizing energy recovery.",
-                expectedOutcomes: ["Pilot UCG plant", "Environmental impact assessment", "Economic feasibility study"]
+                aiScore: {
+                  overall: 85,
+                  technical: 88,
+                  feasibility: 82,
+                  innovation: 90,
+                  impact: 87,
+                  budget: 81,
+                  timeline: 86
+                },
+                submissionDate: "2025-09-18",
+                category: "Digital Innovation"
               },
               { 
                 id: 5, 
-                title: "Coal Mine Safety Enhancement using IoT", 
-                description: "Implementation of Internet of Things (IoT) sensors and real-time monitoring systems to enhance safety protocols in underground coal mining operations.",
-                status: "pending", 
-                author: "Engr. Amit Joshi", 
-                email: "amit.joshi@secl.co.in",
-                domain: "Mining Safety Technology",
-                budget: 2100000,
-                duration: "30 months",
-                institution: "South Eastern Coalfields Limited",
-                createdAt: "2025-10-02T11:20:00Z",
-                submissionDate: "2025-10-02",
+                title: "Carbon Capture and Utilization from Coal Plants", 
+                description: "Research on innovative carbon capture technologies and conversion of captured CO2 into valuable industrial chemicals and materials.",
+                status: "under_review", 
+                author: "Prof. Amit Patel", 
+                domain: "Carbon Management",
+                budget: 485000,
+                createdAt: "2025-09-15T11:20:00Z",
                 assignedStaff: null,
-                priority: "Medium",
-                fundingAgency: "Ministry of Coal",
-                collaborators: ["NIT Raipur", "CIMFR"],
-                keywords: ["IoT sensors", "mine safety", "real-time monitoring"],
-                abstract: "Deployment of comprehensive IoT-based monitoring system for real-time tracking of environmental conditions, equipment status, and personnel safety in underground mines.",
-                expectedOutcomes: ["Real-time safety monitoring", "Predictive maintenance system", "Emergency response automation"]
+                aiScore: {
+                  overall: 89,
+                  technical: 91,
+                  feasibility: 86,
+                  innovation: 92,
+                  impact: 94,
+                  budget: 83,
+                  timeline: 88
+                },
+                submissionDate: "2025-09-15",
+                category: "Climate Technology"
               },
               { 
                 id: 6, 
-                title: "Coal Bed Methane Extraction Optimization", 
-                description: "Research on enhanced coal bed methane (CBM) extraction techniques using advanced drilling technologies and reservoir stimulation methods.",
-                status: "rejected", 
-                author: "Dr. Kavitha Naidu", 
-                email: "kavitha.naidu@ril.com",
-                domain: "Reservoir Engineering",
-                budget: 3800000,
-                duration: "48 months",
-                institution: "Reliance Industries Limited",
-                createdAt: "2025-09-20T13:30:00Z",
-                submissionDate: "2025-09-20",
-                assignedStaff: "Dr. Rahul Gupta",
-                priority: "Low",
-                fundingAgency: "Ministry of Petroleum & Natural Gas",
-                collaborators: ["ONGC", "Cairn Energy"],
-                keywords: ["coal bed methane", "extraction optimization", "reservoir stimulation"],
-                abstract: "Optimization of coal bed methane extraction through advanced horizontal drilling techniques and enhanced reservoir stimulation for increased gas recovery rates.",
-                expectedOutcomes: ["Enhanced extraction rates", "Cost reduction strategies", "Environmental impact minimization"],
-                rejectionReason: "Insufficient environmental impact assessment and limited innovation over existing methods."
-              },
-              { 
-                id: 7, 
-                title: "Renewable Energy Integration in Mining Operations", 
-                description: "Development of hybrid renewable energy systems for coal mining operations to reduce carbon footprint and operational costs.",
-                status: "under_review", 
-                author: "Dr. Sunita Agarwal", 
-                email: "sunita.agarwal@ntpc.co.in",
-                domain: "Renewable Energy",
-                budget: 5200000,
-                duration: "60 months",
-                institution: "National Thermal Power Corporation",
-                createdAt: "2025-09-27T08:45:00Z",
-                submissionDate: "2025-09-27",
-                assignedStaff: null,
-                priority: "High",
-                fundingAgency: "Ministry of New & Renewable Energy",
-                collaborators: ["NTPC Renewable", "Solar Energy Corporation"],
-                keywords: ["renewable energy", "mining operations", "carbon footprint"],
-                abstract: "Integration of solar and wind energy systems with existing coal mining infrastructure to create sustainable hybrid energy solutions for mining operations.",
-                expectedOutcomes: ["60% renewable energy integration", "Cost reduction analysis", "Replication model development"]
-              },
-              { 
-                id: 8, 
-                title: "Advanced Coal Preparation Technologies", 
-                description: "Research on innovative coal preparation and beneficiation techniques to improve coal quality and reduce ash content for better combustion efficiency.",
-                status: "approved", 
-                author: "Prof. Deepak Agrawal", 
-                email: "deepak.agrawal@bhu.ac.in",
-                domain: "Coal Processing",
-                budget: 2800000,
-                duration: "36 months",
-                institution: "Banaras Hindu University",
-                createdAt: "2025-09-22T15:10:00Z",
-                submissionDate: "2025-09-22",
-                assignedStaff: "Dr. Nisha Kapoor",
-                priority: "Medium",
-                fundingAgency: "University Grants Commission",
-                collaborators: ["CSIR-CIMFR", "BHU Mining Department"],
-                keywords: ["coal preparation", "beneficiation", "ash reduction"],
-                abstract: "Development of advanced coal preparation technologies using novel separation techniques to produce high-quality coal with reduced ash content and improved calorific value.",
-                expectedOutcomes: ["50% ash reduction", "Improved coal quality", "Energy-efficient processing"]
+                title: "Smart Mining Safety and Monitoring System", 
+                description: "IoT-based comprehensive safety monitoring system for underground coal mines with real-time hazard detection and automated emergency response.",
+                status: "assigned_to_staff", 
+                author: "Dr. Lisa Anderson", 
+                domain: "Mining Safety Technology",
+                budget: 225000,
+                createdAt: "2025-09-12T13:15:00Z",
+                assignedStaff: "Safety Research Team",
+                aiScore: {
+                  overall: 92,
+                  technical: 89,
+                  feasibility: 94,
+                  innovation: 87,
+                  impact: 96,
+                  budget: 90,
+                  timeline: 93
+                },
+                submissionDate: "2025-09-12",
+                category: "Safety Innovation"
               }
             ]);
           } else if (isStaff()) {
             setProposals([
               { 
                 id: 2, 
-                title: "AI-Based Coal Quality Assessment System", 
-                description: "Implementation of artificial intelligence and machine learning algorithms for real-time coal quality assessment and grading in mining operations.",
+                title: "Sustainable Energy Storage Solutions", 
+                description: "Research on next-generation battery technology for renewable energy storage.",
                 status: "assigned_to_staff", 
-                author: "Dr. Priya Sharma", 
-                email: "priya.sharma@coalindia.in",
-                domain: "Digital Mining Technology",
-                budget: 1800000,
-                duration: "18 months",
-                institution: "Coal India Limited R&D Centre",
-                createdAt: "2025-09-28T14:30:00Z",
-                submissionDate: "2025-09-28",
-                reviewer: "Dr. Sarah Reviewer",
-                priority: "Medium",
-                fundingAgency: "Coal India Limited",
-                collaborators: ["IIT Kharagpur", "ISM Dhanbad"],
-                keywords: ["artificial intelligence", "coal quality", "automated assessment"]
-              },
-              { 
-                id: 3, 
-                title: "Sustainable Mining Waste Management", 
-                description: "Research on innovative approaches for managing coal mining waste through circular economy principles and environmental restoration techniques.",
-                status: "assigned_to_staff", 
-                author: "Prof. Vikram Singh", 
-                email: "vikram.singh@ismdhanbad.ac.in",
-                domain: "Environmental Mining",
-                budget: 3200000,
-                duration: "36 months",
-                institution: "Indian Institute of Technology (ISM) Dhanbad",
-                createdAt: "2025-09-25T09:15:00Z",
-                submissionDate: "2025-09-25",
-                reviewer: "Dr. Environmental Reviewer",
-                priority: "High",
-                fundingAgency: "Department of Science & Technology",
-                collaborators: ["CSIR-CIMFR", "NEERI"],
-                keywords: ["waste management", "circular economy", "environmental restoration"]
+                author: "Jane Smith", 
+                domain: "Energy Technology",
+                budget: 200000,
+                createdAt: "2025-09-19T14:30:00Z",
+                reviewer: "Dr. Sarah Reviewer" 
               }
             ]);
           } else if (isUser()) {
@@ -503,26 +257,7 @@ function DashboardContent() {
   const handleStatusUpdate = async (proposalId, newStatus) => {
     try {
       const token = localStorage.getItem("token");
-      
-      // For demo purposes with sample data, simulate API call success
-      if (!token || proposals.some(p => (p.id || p._id) === proposalId && [1,2,3,4,5,6,7,8].includes(p.id))) {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Update local state for demo
-        setProposals(prevProposals => 
-          prevProposals.map(proposal => 
-            (proposal.id || proposal._id) === proposalId 
-              ? { ...proposal, status: newStatus }
-              : proposal
-          )
-        );
-        alert(`Proposal ${newStatus} successfully! (Demo mode)`);
-        return;
-      }
-
-      // Real API call for actual data
-      const response = await fetch(getProposalUrl(proposalId, 'status'), {
+      const response = await fetch(`http://localhost:5000/api/proposals/${proposalId}/status`, {
         method: 'PATCH',
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -556,26 +291,7 @@ function DashboardContent() {
 
     try {
       const token = localStorage.getItem("token");
-      
-      // For demo purposes with sample data, simulate API call success
-      if (!token || proposals.some(p => (p.id || p._id) === proposalId && [1,2,3,4,5,6,7,8].includes(p.id))) {
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 500));
-        
-        // Update local state for demo
-        setProposals(prevProposals => 
-          prevProposals.map(proposal => 
-            (proposal.id || proposal._id) === proposalId 
-              ? { ...proposal, assignedStaff: staffMember, status: 'assigned_to_staff' }
-              : proposal
-          )
-        );
-        alert(`Proposal assigned to ${staffMember} successfully! (Demo mode)`);
-        return;
-      }
-
-      // Real API call for actual data
-      const response = await fetch(getProposalUrl(proposalId, 'assign'), {
+      const response = await fetch(`http://localhost:5000/api/proposals/${proposalId}/assign`, {
         method: 'PATCH',
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -889,141 +605,22 @@ function DashboardContent() {
                   </div>
                 </div>
                 
-                {/* Additional Information Grid */}
-                {(proposal.institution || proposal.duration || proposal.priority || proposal.fundingAgency) && (
-                  <div className="grid grid-cols-2 gap-3 mb-4">
-                    {proposal.institution && (
-                      <div className="bg-purple-50 rounded-lg p-3 border border-purple-100">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                          </svg>
-                          <span className="text-xs font-medium text-purple-600">Institution</span>
-                        </div>
-                        <div className="text-sm font-semibold text-gray-900 line-clamp-2">{proposal.institution}</div>
-                      </div>
-                    )}
-                    
-                    {proposal.duration && (
-                      <div className="bg-green-50 rounded-lg p-3 border border-green-100">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <svg className="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          <span className="text-xs font-medium text-green-600">Duration</span>
-                        </div>
-                        <div className="text-sm font-semibold text-gray-900">{proposal.duration}</div>
-                      </div>
-                    )}
-                    
-                    {proposal.priority && (
-                      <div className="bg-red-50 rounded-lg p-3 border border-red-100">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                          </svg>
-                          <span className="text-xs font-medium text-red-600">Priority</span>
-                        </div>
-                        <div className={`text-sm font-semibold ${
-                          proposal.priority === 'High' ? 'text-red-600' :
-                          proposal.priority === 'Medium' ? 'text-yellow-600' :
-                          'text-green-600'
-                        }`}>{proposal.priority}</div>
-                      </div>
-                    )}
-                    
-                    {proposal.fundingAgency && (
-                      <div className="bg-indigo-50 rounded-lg p-3 border border-indigo-100">
-                        <div className="flex items-center space-x-2 mb-1">
-                          <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                          </svg>
-                          <span className="text-xs font-medium text-indigo-600">Funding Agency</span>
-                        </div>
-                        <div className="text-sm font-semibold text-gray-900 line-clamp-2">{proposal.fundingAgency}</div>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {/* Collaborators and Keywords */}
-                {(proposal.collaborators?.length > 0 || proposal.keywords?.length > 0) && (
-                  <div className="mb-4 space-y-3">
-                    {proposal.collaborators?.length > 0 && (
-                      <div>
-                        <div className="flex items-center space-x-2 mb-2">
-                          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                          </svg>
-                          <span className="text-xs font-medium text-gray-600">Collaborators</span>
-                        </div>
-                        <div className="flex flex-wrap gap-1">
-                          {proposal.collaborators.slice(0, 3).map((collaborator, idx) => (
-                            <span key={idx} className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full border border-blue-200">
-                              {collaborator}
-                            </span>
-                          ))}
-                          {proposal.collaborators.length > 3 && (
-                            <span className="text-xs text-gray-500">+{proposal.collaborators.length - 3} more</span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                    
-                    {proposal.keywords?.length > 0 && (
-                      <div>
-                        <div className="flex items-center space-x-2 mb-2">
-                          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                          </svg>
-                          <span className="text-xs font-medium text-gray-600">Keywords</span>
-                        </div>
-                        <div className="flex flex-wrap gap-1">
-                          {proposal.keywords.slice(0, 4).map((keyword, idx) => (
-                            <span key={idx} className="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded-full border border-gray-200">
-                              {keyword}
-                            </span>
-                          ))}
-                          {proposal.keywords.length > 4 && (
-                            <span className="text-xs text-gray-500">+{proposal.keywords.length - 4} more</span>
-                          )}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-                
-                {/* Rejection Reason (if applicable) */}
-                {proposal.status === 'rejected' && proposal.rejectionReason && (
-                  <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <svg className="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span className="text-xs font-medium text-red-600">Rejection Reason</span>
-                    </div>
-                    <p className="text-sm text-red-800">{proposal.rejectionReason}</p>
-                  </div>
-                )}
-                
                 {/* Progress Bar */}
                 <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-medium text-gray-500">Progress</span>
                     <span className="text-xs font-bold text-gray-900">
                       {proposal.status === 'draft' ? '25%' :
-                       proposal.status === 'submitted' || proposal.status === 'pending' ? '50%' :
-                       proposal.status === 'under_review' || proposal.status === 'assigned_to_staff' ? '75%' :
-                       proposal.status === 'approved' ? '100%' :
-                       proposal.status === 'rejected' ? '100%' : '0%'}
+                       proposal.status === 'submitted' ? '50%' :
+                       proposal.status === 'under_review' ? '75%' :
+                       proposal.status === 'approved' ? '100%' : '0%'}
                     </span>
                   </div>
                   <div className="w-full bg-gray-200 rounded-full h-2">
                     <div className={`h-2 rounded-full transition-all duration-500 ${
                       proposal.status === 'approved' ? 'bg-green-500 w-full' :
-                      proposal.status === 'rejected' ? 'bg-red-500 w-full' :
-                      proposal.status === 'under_review' || proposal.status === 'assigned_to_staff' ? 'bg-blue-500 w-3/4' :
-                      proposal.status === 'submitted' || proposal.status === 'pending' ? 'bg-orange-500 w-1/2' :
+                      proposal.status === 'under_review' ? 'bg-blue-500 w-3/4' :
+                      proposal.status === 'submitted' ? 'bg-orange-500 w-1/2' :
                       proposal.status === 'draft' ? 'bg-gray-400 w-1/4' :
                       'bg-gray-300 w-0'
                     }`}></div>
@@ -1295,105 +892,88 @@ function DashboardContent() {
                 <div key={proposal.id || proposal._id} className={`group bg-slate-50 hover:bg-white border border-slate-200 hover:border-purple-200 p-8 rounded-2xl hover:shadow-xl transition-all duration-300 animate-fade-in-up hover:scale-105`} style={{animationDelay: `${1400 + index * 100}ms`}}>
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex-1">
-                      <div className="flex items-center gap-3 mb-2">
-                        <h3 className="text-xl font-bold text-black group-hover:text-black group-hover:font-black transition-colors duration-300">{proposal.title}</h3>
-                        <span className="bg-gradient-to-r from-orange-500 to-red-600 text-white px-2 py-1 rounded-full text-xs font-bold">
-                          ID: {(proposal.id || '').toString().slice(-3).padStart(3, '0')}
-                        </span>
-                      </div>
-                      <p className="text-gray-500 mb-3 line-clamp-2 leading-relaxed">{proposal.description}</p>
+                      <h3 className="text-xl font-bold text-black mb-2">{proposal.title}</h3>
+                      <p className="text-gray-500 mb-3 line-clamp-2">{proposal.description}</p>
                       
-                      {/* Enhanced Information Grid */}
-                      <div className="grid md:grid-cols-2 gap-4 text-sm mb-4">
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-3 bg-blue-50 p-3 rounded-lg border border-blue-100">
-                            <svg className="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                            <div>
-                              <div className="text-xs text-blue-600 font-medium mb-1">Author</div>
-                              <div className="text-gray-900 font-semibold">{proposal.author}</div>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-3 bg-green-50 p-3 rounded-lg border border-green-100">
-                            <svg className="w-5 h-5 text-green-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                            </svg>
-                            <div className="flex-1">
-                              <div className="text-xs text-green-600 font-medium mb-1">Institution</div>
-                              <div className="text-gray-900 font-semibold text-xs leading-tight">{proposal.institution}</div>
-                            </div>
-                          </div>
+                      <div className="grid md:grid-cols-2 gap-4 text-sm mb-3">
+                        <div className="space-y-1">
+                          <span className="text-gray-500">
+                            <strong>Author:</strong> {proposal.author}
+                          </span>
+                          <br />
+                          <span className="text-gray-500">
+                            <strong>Domain:</strong> {proposal.domain}
+                          </span>
                         </div>
-                        <div className="space-y-3">
+                        <div className="space-y-1">
                           {proposal.budget && (
-                            <div className="flex items-center gap-3 bg-orange-50 p-3 rounded-lg border border-orange-100">
-                              <svg className="w-5 h-5 text-orange-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
-                              </svg>
-                              <div>
-                                <div className="text-xs text-orange-600 font-medium mb-1">Budget</div>
-                                <div className="text-gray-900 font-bold text-lg">₹{(proposal.budget / 100000).toFixed(1)} Lakhs</div>
-                              </div>
-                            </div>
+                            <>
+                              <span className="text-gray-500">
+                                <strong>Budget:</strong> ₹{proposal.budget.toLocaleString()}
+                              </span>
+                              <br />
+                            </>
                           )}
-                          {proposal.duration && (
-                            <div className="flex items-center gap-3 bg-purple-50 p-3 rounded-lg border border-purple-100">
-                              <svg className="w-5 h-5 text-purple-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                              </svg>
-                              <div>
-                                <div className="text-xs text-purple-600 font-medium mb-1">Duration</div>
-                                <div className="text-gray-900 font-semibold">{proposal.duration}</div>
-                              </div>
-                            </div>
+                          {proposal.createdAt && (
+                            <span className="text-gray-500">
+                              <strong>Submitted:</strong> {new Date(proposal.createdAt).toLocaleDateString()}
+                            </span>
                           )}
                         </div>
                       </div>
 
-                      {/* Domain and Keywords Tags */}
-                      <div className="mb-4">
-                        <div className="flex flex-wrap gap-3 mb-3">
-                          <span className="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg border-2 border-blue-200 flex items-center gap-2">
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
-                            </svg>
-                            {proposal.domain}
-                          </span>
-                          {proposal.priority && (
-                            <span className={`px-4 py-2 rounded-full text-sm font-bold shadow-lg border-2 flex items-center gap-2 ${
-                              proposal.priority === 'High' ? 'bg-gradient-to-r from-red-500 to-red-600 text-white border-red-200' :
-                              proposal.priority === 'Medium' ? 'bg-gradient-to-r from-yellow-500 to-yellow-600 text-white border-yellow-200' :
-                              'bg-gradient-to-r from-green-500 to-green-600 text-white border-green-200'
+                      {/* AI Score Section */}
+                      {proposal.aiScore && (
+                        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg mb-4 border border-blue-200">
+                          <div className="flex items-center justify-between mb-3">
+                            <h4 className="text-sm font-bold text-gray-800 flex items-center gap-2">
+                              <svg className="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                              </svg>
+                              AI Assessment Score
+                            </h4>
+                            <div className={`px-3 py-1 rounded-full text-xs font-bold ${
+                              proposal.aiScore.overall >= 90 ? 'bg-green-100 text-green-800' :
+                              proposal.aiScore.overall >= 80 ? 'bg-blue-100 text-blue-800' :
+                              proposal.aiScore.overall >= 70 ? 'bg-yellow-100 text-yellow-800' :
+                              'bg-red-100 text-red-800'
                             }`}>
-                              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                              </svg>
-                              {proposal.priority} Priority
-                            </span>
-                          )}
-                        </div>
-                        {proposal.keywords && proposal.keywords.length > 0 && (
-                          <div className="bg-gray-50 p-3 text-black rounded-lg border border-gray-200">
-                            <div className="text-xs text-black font-medium mb-2 flex items-center gap-1">
-                              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-                              </svg>
-                              Research Keywords
-                            </div>
-                            <div className="flex flex-wrap gap-3">
-                              {proposal.keywords.slice(0, 3).map((keyword, idx) => (
-                                <span key={idx} className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold shadow-lg border border-blue-700 hover:bg-blue-700 hover:shadow-xl transition-all duration-200 flex items-center gap-1">
-                                  <span className="text-black">#</span>{keyword}
-                                </span>
-                              ))}
-                              {proposal.keywords.length > 3 && (
-                                <span className="text-sm text-blue-700 px-4 py-2 font-bold bg-blue-100 rounded-lg border border-blue-300 shadow-md">+{proposal.keywords.length - 3} more</span>
-                              )}
+                              {proposal.aiScore.overall}/100
                             </div>
                           </div>
-                        )}
-                      </div>
+                          
+                          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                            {Object.entries(proposal.aiScore).filter(([key]) => key !== 'overall').map(([category, score]) => (
+                              <div key={category} className="bg-white p-3 rounded-lg border border-gray-100">
+                                <div className="flex justify-between items-center mb-1">
+                                  <span className="text-xs font-medium text-gray-600 capitalize">
+                                    {category.replace(/([A-Z])/g, ' $1').trim()}
+                                  </span>
+                                  <span className="text-xs font-bold text-gray-800">{score}</span>
+                                </div>
+                                <div className="w-full bg-gray-200 rounded-full h-2">
+                                  <div 
+                                    className={`h-2 rounded-full transition-all duration-500 ${
+                                      score >= 90 ? 'bg-green-500' :
+                                      score >= 80 ? 'bg-blue-500' :
+                                      score >= 70 ? 'bg-yellow-500' :
+                                      'bg-red-500'
+                                    }`}
+                                    style={{ width: `${score}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          
+                          <div className="mt-3 text-xs text-gray-500 flex items-center gap-1">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            AI assessment based on technical feasibility, innovation potential, and research impact
+                          </div>
+                        </div>
+                      )}
 
                       {proposal.assignedStaff && (
                         <div className="bg-green-50 p-3 rounded-lg mb-3">
@@ -1458,7 +1038,15 @@ function DashboardContent() {
                         Assign Staff
                       </button>
                     )}
-                  
+                    
+                    <Link href={`/proposal/collaborate/${proposal.id || proposal._id}`}>
+                      <button className="group bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-1 hover:scale-105 transition-all duration-300 flex items-center gap-2">
+                        <svg className="w-4 h-4 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        Collaborate
+                      </button>
+                    </Link>
                     
                     <button 
                       onClick={() => handleSendFeedback(proposal.id || proposal._id)}
