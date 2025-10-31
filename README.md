@@ -4,7 +4,7 @@
 ### *AI-Powered Research Proposal Management System*
 
 <img src="assets/sih-logo.png" alt="Smart India Hackathon 2025" width="200"/>
-<img src="assets/team-logo.png" alt="Team Logo" width="200"/>
+<img src="assets/tem-logo.png" alt="Team Logo" width="200"/>
 
 **Smart India Hackathon 2025 | Problem Statement ID: SIH25180**
 
@@ -215,6 +215,10 @@ Unlike generic document management systems, our platform handles:
 - **GDPR/IT Act 2000 compliance**: Data privacy and retention policies
 
 ---
+
+## Technical Architecture
+
+<img src="assets/arch-diag.jpg" alt="architecture-diagram" width="800"/>
 
 ## 🌱 Environmental & Social Impact
 
@@ -888,24 +892,6 @@ We welcome contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 - **Backend:** ESLint (Standard config)
 - **Python:** PEP 8 (Black formatter)
 
----
-
-## 👨‍💻 Team
-
-**Team Name:** [Your Team Name]
-
-| Role | Name | LinkedIn | GitHub |
-|------|------|----------|--------|
-| Team Lead | [Name] | [Profile] | [Username] |
-| Full Stack Developer | [Name] | [Profile] | [Username] |
-| AI/ML Engineer | [Name] | [Profile] | [Username] |
-| Frontend Developer | [Name] | [Profile] | [Username] |
-| Backend Developer | [Name] | [Profile] | [Username] |
-| UI/UX Designer | [Name] | [Profile] | [Username] |
-
-**Mentors:** [Mentor Names]
-
-**Institution:** [Your College/Organization]
 
 ---
 
