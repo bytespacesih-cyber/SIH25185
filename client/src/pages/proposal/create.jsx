@@ -60,7 +60,7 @@ function CreateProposalContent() {
       { stage: 'Parsing document structure...', duration: 2500 },
       { stage: 'Extracting content to editor...', duration: 3000 },
       { stage: 'Processing images and tables...', duration: 2000 },
-      { stage: 'Applying NaCCER compliance check...', duration: 1800 },
+  { stage: 'Applying MoDoNER compliance check...', duration: 1800 },
       { stage: 'Storing securely on blockchain...', duration: 2200 },
       { stage: 'Finalizing secure import...', duration: 1500 }
     ];
@@ -236,7 +236,7 @@ function CreateProposalContent() {
                 <div className="flex items-center space-x-3">
                   <div className="flex items-center">
                     <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse mr-3"></div>
-                    <span className="text-blue-100 font-semibold text-lg">NaCCER Research Portal</span>
+                    <span className="text-blue-100 font-semibold text-lg">MoDoNER portal</span>
                   </div>
                   <div className="h-4 w-px bg-blue-300/50"></div>
                   <span className="text-blue-200 font-medium text-sm">Department of Coal</span>
@@ -519,7 +519,7 @@ function CreateProposalContent() {
                           </li>
                           <li className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 bg-orange-500 rounded-full flex-shrink-0"></div>
-                            Automatic NaCCER compliance checking
+                            Automatic MoDoNER compliance checking
                           </li>
                           <li className="flex items-center gap-2">
                             <div className="w-1.5 h-1.5 bg-orange-500 rounded-full flex-shrink-0"></div>
@@ -574,7 +574,7 @@ function CreateProposalContent() {
                           {uploadStage}
                         </div>
                         <div className="text-sm text-black">
-                          Secure Blockchain Processing • NaCCER Compliant
+                            Secure Blockchain Processing • MoDoNER Compliant
                         </div>
                       </div>
                       
@@ -723,7 +723,7 @@ function CreateProposalContent() {
                         <div className="bg-orange-50 border border-orange-200 rounded-lg p-3">
                           <p className="text-sm text-black text-center">
                             Your document is now securely stored on blockchain and loaded in our AI-powered editor. 
-                            You can make additional changes, get SAARTHI assistance, or proceed with your NaCCER submission.
+                            You can make additional changes, get SAARTHI assistance, or proceed with your MoDoNER submission.
                           </p>
                         </div>
                       </div>

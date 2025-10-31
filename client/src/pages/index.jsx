@@ -12,10 +12,10 @@ export default function Home() {
 
   // Array of banner images
   const bannerImages = [
-    "/images/banner image.jpg", // Default image (first)
-    "/images/aatai1.jpeg",
-    "/images/aatai2.png",
-    "/images/Sibi.png"
+    "/images/dash11.jpg", // Default image (first)
+    "/images/dash22.webp",
+    "/images/dash33.webp",
+    "/images/dash44.jpg"
   ];
 
   // Auto-switch images every 4 seconds
@@ -58,7 +58,7 @@ export default function Home() {
         body: JSON.stringify({
           email: collaboratorEmail,
           inviteType: 'collaboration',
-          platform: 'NaCCER Research Portal'
+          platform: 'MoDoNER portal'
         }),
       });
 
@@ -144,7 +144,7 @@ export default function Home() {
         <div className="absolute bottom-8 left-8 right-8 z-10">
           <div className="text-white max-w-2xl">
             <h1 className="text-2xl md:text-4xl font-bold mb-2 drop-shadow-lg">
-              National Coal Committee for Environmental Research
+              Ministry of Development of North Eastern Region
             </h1>
             <p className="text-sm md:text-lg drop-shadow-md">
               Advanced R&D Proposal Management System
@@ -163,16 +163,16 @@ export default function Home() {
                 <div className="flex items-center justify-center lg:justify-start gap-4">
                   <div className="w-20 h-20 bg-white rounded-lg flex items-center justify-center overflow-hidden shadow-md border">
                     <img 
-                      src="/images/prism brand logo.png" 
-                      alt="PRISM Logo" 
+                      src="/images/neuro_1.png" 
+                      alt="NEURO Logo" 
                       className="w-full h-full object-contain p-2"
                     />
                   </div>
                   <div className="text-left">
-                    <h2 className="text-2xl font-bold text-black mb-2">PRISM</h2>
+                    <h2 className="text-2xl font-bold text-black mb-2">NEURO</h2>
                     <p className="text-sm text-black font-medium">
-                      Proposal Review & Innovation
-                      Support Mechanism
+                      Neural Evaluation and 
+                      Unified Review Architecture
                     </p>
                   </div>
                 </div>
@@ -180,10 +180,10 @@ export default function Home() {
               
               <div className="bg-white p-6 rounded-lg shadow-lg border border-gray-200 mb-8">
                 <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4 leading-tight">
-                  NaCCER Research Portal
+                  MoDoNER portal
                 </h1>
                 <p className="text-lg text-gray-900 font-semibold leading-relaxed">
-                  National Coal Committee for Environmental Research - Advanced R&D Proposal Management System for sustainable coal research and innovation.
+                  Ministry of Development of North Eastern Region - Advanced R&D Proposal Management System for sustainable coal research and innovation.
                 </p>
               </div>
               
@@ -375,20 +375,21 @@ export default function Home() {
               </h2>
               <div className="text-lg text-gray-900 font-medium leading-relaxed space-y-4">
                 <p>
-                  We are dedicated to serving the public by advancing coal research and development initiatives in India. 
-                  The Ministry of Coal is committed to sustainable mining practices, environmental protection, and 
-                  technological innovation in the coal sector.
+                  We are dedicated to promoting balanced and inclusive development across the North Eastern Region of India. 
+                  The Ministry of Development of North Eastern Region (MDoNER) is committed to enhancing infrastructure, 
+                  connectivity, and sustainable growth across all eight northeastern states.
                 </p>
                 <p>
-                  Our team of experienced professionals focuses on promoting clean coal technologies, 
-                  carbon capture and storage solutions, and supporting research initiatives that contribute to 
-                  India's energy security while maintaining environmental standards.
+                  Our team works towards empowering communities through innovative programs, capacity building, 
+                  and strategic partnerships that foster socio-economic progress and regional integration. 
+                  We focus on delivering impactful initiatives that bridge developmental gaps and strengthen livelihoods.
                 </p>
                 <p>
-                  We believe in transparency, innovation, and excellence in all our operations. 
-                  The NaCCER portal represents our commitment to streamlined research management and 
-                  collaborative scientific advancement in the coal and mining sector.
+                  We believe in transparency, collaboration, and excellence in all our initiatives. 
+                  The MDoNER portal reflects our commitment to efficient governance, regional empowerment, 
+                  and sustainable development for a stronger and more connected North Eastern India.
                 </p>
+
               </div>
               <a href="https://www.coal.nic.in" target="_blank" rel="noopener noreferrer">
                 <button className="mt-8 border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-6 py-3 rounded-md font-medium transition-colors duration-200">
@@ -399,7 +400,7 @@ export default function Home() {
             <div className="flex-shrink-0 space-y-6">
               <div className="w-80 h-40 bg-gray-200 rounded-lg overflow-hidden">
                 <img 
-                  src="/images/coal mining image.webp" 
+                  src="/images/image1.jpeg" 
                   alt="Coal Mining Operations" 
                   className="w-full h-full object-cover"
                 />
@@ -423,10 +424,10 @@ export default function Home() {
             <h2 className="text-4xl font-bold text-center text-white mb-8 animate-fade-in-up border-b-4 border-yellow-500 pb-4 inline-block">Our Ministers</h2>
           </div>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-            {/* Prime Minister */}
-            <div className="text-center animate-fade-in-up">
-              <div className="w-64 h-64 bg-gray-300 rounded-full mx-auto mb-6 flex items-center justify-center overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 items-stretch">
+            {/* Prime Minister - left column (1) */}
+            <div className="text-center animate-fade-in-up lg:col-span-1 flex flex-col justify-center items-center">
+              <div className="w-64 h-64 lg:w-72 lg:h-72 bg-gray-300 rounded-full mx-auto mb-6 flex items-center justify-center overflow-hidden">
                 <img 
                   src="/images/narendra modi.jpg" 
                   alt="Hon'ble Prime Minister Shri Narendra Modi"
@@ -435,13 +436,13 @@ export default function Home() {
               </div>
               <h3 className="text-2xl font-bold mb-2">Hon'ble Prime Minister</h3>
               <p className="text-xl mb-4">Shri Narendra Modi</p>
-              
+
               <div className="flex justify-center gap-4 mb-4">
                 <a href="https://www.pmindia.gov.in/en/" target="_blank" rel="noopener noreferrer" className="text-blue-300 hover:text-white text-sm font-medium border border-blue-300 hover:border-white px-4 py-2 rounded transition-colors">
                   Portfolio
                 </a>
               </div>
-              
+
               <div className="flex justify-center gap-4">
                 <a href="https://x.com/pmoindia" target="_blank" rel="noopener noreferrer" className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center hover:bg-white/30 cursor-pointer transition-colors">
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -461,38 +462,50 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Other Ministers */}
-            <div className="space-y-8 animate-fade-in-up animation-delay-300">
-              <a href="https://www.coal.nic.in/index.php/minister/shri-g-kishan-reddy" target="_blank" rel="noopener noreferrer" className="flex items-center gap-6 hover:bg-white/10 p-4 rounded-lg transition-colors">
-                <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
-                  <img 
-                    src="/images/kishan reddy.jpg" 
-                    alt="Shri G. Kishan Reddy"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="text-lg font-medium text-blue-200">Hon'ble Union Minister</p>
-                  <h3 className="text-xl font-bold">Shri G. Kishan Reddy</h3>
-                  <p className="text-sm text-blue-200">Coal and Mines, Govt. of India</p>
-                </div>
-              </a>
-              
-              <a href="https://www.coal.nic.in/index.php/minister/shri-satish-chandra-dubey" target="_blank" rel="noopener noreferrer" className="flex items-center gap-6 hover:bg-white/10 p-4 rounded-lg transition-colors">
-                <div className="w-24 h-24 bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
-                  <img 
-                    src="/images/satish chandra dubey.jpg" 
-                    alt="Shri Satish Chandra Dubey"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div>
-                  <p className="text-lg font-medium text-blue-200">Hon'ble Minister of State</p>
-                  <h3 className="text-xl font-bold">Shri Satish Chandra Dubey</h3>
-                  <p className="text-sm text-blue-200">Coal and Mines, Govt. of India</p>
-                </div>
-              </a>
+            {/* Other Ministers - right column (2) split into two equal cards, shifted right with spacing */}
+            <div className="space-y-10 animate-fade-in-up animation-delay-300 lg:col-span-2 h-full flex flex-col items-end justify-center px-4 lg:pr-12">
+              <div className="flex flex-col items-end w-full space-y-8">
+
+                <a href="https://mdoner.gov.in/about-ministry/officials" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center gap-6 hover:bg-white/10 p-6 rounded-lg transition-colors w-full max-w-[85%] border border-white/10 shadow-md">
+                  <div className="w-32 h-32 md:w-36 md:h-36 bg-gray-300 rounded-full overflow-hidden flex-shrink-0 border-2 border-white/10 flex items-center justify-center">
+                    <img 
+                      src="/images/cabinet minister.webp" 
+                      alt="Shri Jyotiraditya M. Scindia"
+                      className="w-full h-full "
+                    />
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <p className="text-lg font-medium text-blue-200">Hon'ble Cabinet Minister</p>
+                    <h3 className="text-2xl font-bold">Shri Jyotiraditya M. Scindia</h3>
+                    <p className="text-sm text-blue-200">Ministry of Development of North Eastern Region, Govt. of India</p>
+                  </div>
+                </a>
+
+                <a href="https://mdoner.gov.in/about-ministry/officials" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="flex items-center gap-6 hover:bg-white/10 p-6 rounded-lg transition-colors w-full max-w-[85%] border border-white/10 shadow-md">
+                  <div className="w-32 h-32 md:w-36 md:h-36 bg-gray-300 rounded-full overflow-hidden flex-shrink-0 border-2 border-white/10 flex items-center justify-center">
+                    <img 
+                      src="/images/ruggedguy.jpeg" 
+                      alt="Dr. Sukanta Majumdar" 
+                     className="w-full h-full object-[40%_20%] block"
+
+                    />
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <p className="text-lg font-medium text-blue-200">Hon'ble Minister of State</p>
+                    <h3 className="text-2xl font-bold">Dr. Sukanta Majumdar</h3>
+                    <p className="text-sm text-blue-200">Ministry of Development of North Eastern Region, Govt. of India</p>
+                  </div>
+                </a>
+
+              </div>
             </div>
+
           </div>
         </div>
       </section>
@@ -627,26 +640,8 @@ export default function Home() {
                 
                 <div className="space-y-4 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-200 overflow-hidden">
                   <p className="text-lg font-semibold text-white">
-                    To Secure availability of Coal to meet the demand of various sectors of the economy in a eco-friendly, sustainable and cost effective manner.
+                    Transforming North East Region through Development, in a Sustainable yet Accelerated manner, affording comprehensive growth and access to ease of living to all its citizens.
                   </p>
-                  
-                  <div className="text-gray-100">
-                    <p className="font-medium mb-3 text-white">Ministry of Coal is committed to:</p>
-                    <ul className="space-y-2 text-sm">
-                      <li className="flex items-start">
-                        <span className="w-2 h-2 bg-white rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span className="text-gray-100">Augment production through Government companies as well as captive mining route by adopting state-of-the-art and clean coal technologies with a view to improve productivity, safety, quality and ecology.</span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="w-2 h-2 bg-white rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span className="text-gray-100">Augment the resource base by enhancing exploration efforts with thrust on increasing proved resources.</span>
-                      </li>
-                      <li className="flex items-start">
-                        <span className="w-2 h-2 bg-white rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span className="text-gray-100">Facilitate development of necessary infrastructure for prompt evacuation of coal.</span>
-                      </li>
-                    </ul>
-                  </div>
                 </div>
               </div>
             </div>
@@ -664,26 +659,32 @@ export default function Home() {
                 
                 <div className="space-y-4 opacity-0 group-hover:opacity-100 transition-opacity duration-700 delay-200 overflow-hidden">
                   <div className="text-gray-100">
-                    <ul className="space-y-3">
+                    <ul className="space-y-3 text-sm">
                       <li className="flex items-start">
                         <span className="w-2 h-2 bg-white rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span className="text-sm text-gray-100">To augment production through Government companies as well as captive mining route by adopting state-of-the-art and clean coal technologies with a view to improve productivity, safety, quality and ecology.</span>
+                        <span className="text-gray-100 font-medium">Synergize policies, plans and execution for rapid development of NE Region.</span>
                       </li>
                       <li className="flex items-start">
                         <span className="w-2 h-2 bg-white rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span className="text-sm text-gray-100">To augment the resource base by enhancing exploration efforts with thrust on increasing proved resources.</span>
+                        <span className="text-gray-100">Collaborating with Central Ministries, States, Agencies &amp; Expert Stakeholders.</span>
                       </li>
                       <li className="flex items-start">
                         <span className="w-2 h-2 bg-white rounded-full mt-2 mr-3 flex-shrink-0"></span>
-                        <span className="text-sm text-gray-100">To facilitate development of necessary infrastructure for prompt evacuation of coal.</span>
+                        <span className="text-gray-100">Ensuring full utilization of 10% GBS and other budgetary resources for NER.</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="w-2 h-2 bg-white rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <span className="text-gray-100">Promoting investment in the NER, including public, private, corporate &amp; multilateral funding.</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="w-2 h-2 bg-white rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <span className="text-gray-100">Developing infrastructure to mitigate connectivity and social sector deficits of the region.</span>
+                      </li>
+                      <li className="flex items-start">
+                        <span className="w-2 h-2 bg-white rounded-full mt-2 mr-3 flex-shrink-0"></span>
+                        <span className="text-gray-100">Strengthening institutions and networks for livelihood, social services, skills and capacity.</span>
                       </li>
                     </ul>
-                  </div>
-                  
-                  <div className="mt-6 p-4 bg-white/10 rounded-lg">
-                    <p className="text-sm text-gray-200 font-medium">
-                      Driving sustainable development in India's coal sector through innovation, technology, and environmental stewardship.
-                    </p>
                   </div>
                 </div>
               </div>
@@ -755,7 +756,7 @@ export default function Home() {
                   <div className="w-full h-80 bg-gradient-to-br from-blue-100 to-blue-200 rounded-lg overflow-hidden">
                     <img 
                       src="/images/coal lab image.jpg" 
-                      alt="Coal Research Laboratory"
+                      alt="Research Laboratory"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -1082,26 +1083,25 @@ export default function Home() {
             <div className="flex-1 animate-fade-in-up">
               <h2 className="text-4xl font-bold text-gray-900 mb-6 border-b-4 border-red-600 pb-4 inline-block">Social Media</h2>
               <p className="text-lg text-gray-900 font-semibold mb-8">
-                Explore our social media presence and stay updated with the latest developments 
-                in coal research and sustainable mining practices.
+                Explore our social media presence and stay updated with the latest developments across the North Eastern Region.
               </p>
-              
+
               <div className="flex gap-6">
-                <a href="https://www.youtube.com/@coalministry3323" target="_blank" rel="noopener noreferrer" className="w-16 h-16 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white transition-colors hover:scale-110 transform">
+                <a href="https://www.youtube.com/@mdonerindia" target="_blank" rel="noopener noreferrer" className="w-16 h-16 bg-red-600 hover:bg-red-700 rounded-full flex items-center justify-center text-white transition-colors hover:scale-110 transform">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                   </svg>
                 </a>
-                
-                <a href="https://x.com/CoalMinistry" target="_blank" rel="noopener noreferrer" className="w-16 h-16 bg-black hover:bg-gray-800 rounded-full flex items-center justify-center text-white transition-colors hover:scale-110 transform">
+
+                <a href="https://x.com/MDoNER_India" target="_blank" rel="noopener noreferrer" className="w-16 h-16 bg-black hover:bg-gray-800 rounded-full flex items-center justify-center text-white transition-colors hover:scale-110 transform">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
                   </svg>
                 </a>
 
-                <a href="https://linktr.ee/ministryofcoal" target="_blank" rel="noopener noreferrer" className="w-16 h-16 bg-green-500 hover:bg-green-600 rounded-full flex items-center justify-center text-white transition-colors hover:scale-110 transform">
+                <a href="https://mdoner.gov.in" target="_blank" rel="noopener noreferrer" className="w-16 h-16 bg-blue-600 hover:bg-blue-700 rounded-full flex items-center justify-center text-white transition-colors hover:scale-110 transform">
                   <svg className="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M7.953 15.066c-.08.163-.08.324-.08.486.001.162.08.325.161.486.24.408.645.652 1.084.652.44 0 .845-.244 1.084-.652.08-.161.16-.324.16-.486 0-.162-.08-.323-.16-.486-.239-.408-.644-.652-1.084-.652-.439 0-.844.244-1.084.652l-.081-.001zm8.094 0c-.08.163-.08.324-.08.486.001.162.08.325.161.486.24.408.645.652 1.084.652.44 0 .845-.244 1.084-.652.08-.161.16-.324.16-.486 0-.162-.08-.323-.16-.486-.239-.408-.644-.652-1.084-.652-.439 0-.844.244-1.084.652l-.081-.001zM12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm3.5 6l-3.5 3.5L8.5 8 12 4.5 15.5 8zM8.5 16L12 12.5l3.5 3.5L12 19.5 8.5 16z"/>
+                    <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2z"/>
                   </svg>
                 </a>
               </div>
@@ -1120,36 +1120,35 @@ export default function Home() {
                           className="w-8 h-6 rounded"
                         />
                         <div>
-                          <h3 className="font-bold text-sm">Ministry of Coal</h3>
-                          <p className="text-xs text-gray-300">@CoalMinistry</p>
+                          <h3 className="font-bold text-sm">Ministry of Development of North Eastern Region</h3>
+                          <p className="text-xs text-gray-300">@MDoNER_India</p>
                         </div>
-                        <a href="https://x.com/CoalMinistry" target="_blank" rel="noopener noreferrer" className="ml-auto bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-full text-xs transition-colors">
+                        <a href="https://x.com/MDoNER_India" target="_blank" rel="noopener noreferrer" className="ml-auto bg-blue-600 hover:bg-blue-700 px-3 py-1 rounded-full text-xs transition-colors">
                           Follow
                         </a>
                       </div>
                     </div>
                     <div className="p-4 flex-1">
                       <p className="text-sm text-gray-900 mb-3 font-semibold">
-                        Latest updates on sustainable coal research and clean energy initiatives. 
-                        Building a greener future for India. 🇮🇳
+                        Latest updates on development initiatives, infrastructure growth, and empowerment across India’s North Eastern Region. Working towards a stronger, connected, and prosperous Northeast. 🇮🇳
                       </p>
                       <div className="text-xs text-gray-800 space-y-1">
                         <div className="font-medium">📍 New Delhi, India</div>
-                        <div className="font-medium">🔗 <a href="https://www.coal.nic.in" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-bold">coal.nic.in</a></div>
-                        <div className="flex gap-4 mt-2 font-bold text-gray-900">
-                          <span>52 Following</span>
-                          <span>364.5K Followers</span>
+                        <div className="font-medium">
+                          🔗 <a href="https://mdoner.gov.in" target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline font-bold">mdoner.gov.in</a>
                         </div>
-                        
-                        {/* Ministry of Coal Banner */}
-                        <div className="mt-3 rounded-lg overflow-hidden">
-                          <img 
-                            src="/images/ministry of coal banner.jpeg" 
-                            alt="Ministry of Coal Banner"
-                            className="w-full h-24 object-cover"
-                          />
+                        <div className="flex gap-4 mt-2 font-bold text-gray-900">
+                          <span>123 Following</span>
+                          <span>147.6K Followers</span>
                         </div>
                       </div>
+                    </div>
+                    <div className="mt-3 rounded-lg overflow-hidden">
+                      <img 
+                        src="/images/ministry of coal banner.jpeg" 
+                        alt="Ministry Banner"
+                        className="w-full h-24 object-cover"
+                      />
                     </div>
                   </div>
                 </div>
@@ -1222,8 +1221,8 @@ export default function Home() {
             </div>
             
             <div className="mt-4 p-3 bg-blue-50 rounded-md">
-              <p className="text-sm text-blue-700">
-                <strong>Note:</strong> An email invitation will be sent to the collaborator with instructions to join the NaCCER Research Portal.
+                  <p className="text-sm text-blue-700">
+                <strong>Note:</strong> An email invitation will be sent to the collaborator with instructions to join the MoDoNER portal.
               </p>
             </div>
           </div>

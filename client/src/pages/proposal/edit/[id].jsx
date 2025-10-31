@@ -385,7 +385,7 @@ function EditProposalContent() {
                 <div className="flex items-center space-x-3">
                   <div className="flex items-center">
                     <div className="w-2 h-2 bg-orange-400 rounded-full animate-pulse mr-3"></div>
-                    <span className="text-blue-100 font-semibold text-lg">NaCCER Research Portal</span>
+                    <span className="text-blue-100 font-semibold text-lg">MoDoNER portal</span>
                   </div>
                   <div className="h-4 w-px bg-blue-300/50"></div>
                   <span className="text-blue-200 font-medium text-sm">Department of Coal</span>

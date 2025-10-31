@@ -69,7 +69,7 @@ export default function Login() {
                 <div className="w-1.5 h-1.5 bg-green-600 rounded-full animate-pulse animation-delay-500"></div>
               </div>
               <h2 className="text-2xl font-bold text-slate-900 mb-2">Welcome Back</h2>
-              <p className="text-slate-600 text-sm">Sign in to your NaCCER account</p>
+              <p className="text-slate-600 text-sm">Sign in to your MoDoNER account</p>
               <div className="w-20 h-0.5 bg-gradient-to-r from-orange-500 to-green-500 mx-auto mt-3 animate-scale-x"></div>
             </div>
           

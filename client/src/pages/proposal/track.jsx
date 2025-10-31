@@ -93,7 +93,7 @@ function TrackProposalContent() {
           <div className="max-w-7xl mx-auto">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center">
-                <h1 className="text-2xl font-bold">NaCCER Portal</h1>
+                <h1 className="text-2xl font-bold">MoDoNER portal</h1>
               </div>
               <button 
                 onClick={() => router.push('/dashboard')}

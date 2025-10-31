@@ -30,7 +30,7 @@ export default function Chatbot({ showSaarthi, setShowSaarthi, showVersionHistor
         },
         {
           type: 'bot',
-          text: 'I can assist you with:\n• Advanced research methodology design\n• Coal technology innovation strategies\n• Budget optimization and resource allocation\n• Technical writing and documentation\n• NaCCER compliance and S&T guidelines\n• Multi-institutional collaboration frameworks\n\nWhat specific aspect of your proposal would you like to explore?',
+          text: 'I can assist you with:\n• Advanced research methodology design\n• Coal technology innovation strategies\n• Budget optimization and resource allocation\n• Technical writing and documentation\n• MoDoNER compliance and S&T guidelines\n• Multi-institutional collaboration frameworks\n\nWhat specific aspect of your proposal would you like to explore?',
           timestamp: new Date().toLocaleTimeString()
         }
       ];
@@ -136,7 +136,7 @@ export default function Chatbot({ showSaarthi, setShowSaarthi, showVersionHistor
       const responses = [
         'मैं आपके अनुसंधान प्रस्ताव के लिए विस्तृत रणनीति तैयार कर रहा हूँ। आइए कोयला प्रौद्योगिकी में नवाचार के अवसरों पर चर्चा करते हैं।',
         'Excellent query! For coal technology research, I recommend focusing on clean coal technologies, carbon capture methods, and sustainable mining practices. Let me suggest some specific research directions.',
-        'Based on NaCCER guidelines, your proposal should emphasize multi-institutional collaboration and technology transfer potential. I can help structure your methodology section.',
+  'Based on MoDoNER guidelines, your proposal should emphasize multi-institutional collaboration and technology transfer potential. I can help structure your methodology section.',
         'आपका बजट अनुकूलन एक महत्वपूर्ण पहलू है। मैं संसाधन आवंटन और cost-effectiveness metrics के लिए सुझाव दे सकता हूँ।',
         'For S&T compliance, ensure your proposal aligns with national coal research priorities. I can guide you through the technical documentation requirements.',
         'Consider incorporating AI/ML applications in coal analysis and predictive maintenance. This aligns with current research trends and funding priorities.',

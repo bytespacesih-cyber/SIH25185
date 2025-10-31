@@ -15,7 +15,7 @@ export default function Document() {
         
         {/* Meta tags for better SEO */}
         <meta name="theme-color" content="#ea580c" />
-        <meta name="description" content="NaCCER Portal - National Centre for Coal & Energy Research" />
+  <meta name="description" content="MoDoNER portal - National Centre for Coal & Energy Research" />
       </Head>
       <body>
         <Main />

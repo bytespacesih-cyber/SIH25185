@@ -29,12 +29,12 @@ export default function LoadingScreen() {
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="w-4 h-4 bg-orange-400 rounded-full animate-pulse"></div>
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-orange-600 via-slate-900 to-green-600 bg-clip-text text-transparent">
-              NaCCER Portal
+              MoDoNER portal
             </h1>
             <div className="w-4 h-4 bg-green-400 rounded-full animate-pulse animation-delay-500"></div>
           </div>
           <div className="text-sm text-slate-500 font-medium mb-8">
-            National Centre for Centres for Engineering Research
+            Ministry of Development of North Eastern Region (MDONER), Government of India
           </div>
         </div>
         

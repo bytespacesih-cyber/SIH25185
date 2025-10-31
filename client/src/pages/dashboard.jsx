@@ -758,7 +758,7 @@ function DashboardContent() {
               </div>
               <div className="text-xs text-gray-500 text-right">
                 <div>Review Committee</div>
-                <div>NaCCER Initiative</div>
+                <div>MoDoNER Initiative</div>
               </div>
             </div>
           </div>
@@ -1247,7 +1247,7 @@ function DashboardContent() {
                     <span className="text-blue-100 font-semibold text-lg">Welcome back, {user?.name}</span>
                   </div>
                   <div className="h-4 w-px bg-blue-300/50"></div>
-                  <span className="text-blue-200 font-medium text-sm">NaCCER Research Portal</span>
+                  <span className="text-blue-200 font-medium text-sm">MoDoNER portal</span>
                 </div>
                 <div className="flex items-center gap-4 mt-2 text-sm text-blue-200">
                   <span>Active Proposals: {proposals.length}</span>

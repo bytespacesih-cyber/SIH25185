@@ -116,22 +116,22 @@ export default function Navbar({ variant = "default" }) {
           <div className="absolute top-0 -left-5 w-24 h-24 bg-white/5 rounded-full animate-float animation-delay-1000"></div>
         </div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+        <div className="relative z-10 w-full px-6 sm:px-8 lg:px-12">
+          <div className="flex justify-between items-center h-20 py-2 max-w-screen-2xl mx-auto">
             {/* (SIH ID badge moved near right controls) */}
             {/* Combined Government & Logo Section */}
             <Link href={user ? "/dashboard" : "/"}>
-              <div className="flex items-center gap-6 cursor-pointer group">
+              <div className="flex items-center gap-8 cursor-pointer group">
                 {/* Government Section */}
                 <div className={`flex items-center gap-4 text-sm font-semibold ${navStyles.text}`}>
                   {/* SIH TEAM ID moved to corner badge */}
-                  <a href="https://www.india.gov.in/" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 px-2 py-1 rounded transition-colors ${
+                  <a href="https://www.india.gov.in/" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-3 px-3 py-2 rounded transition-colors ${
                     variant === "profile" ? 'hover:bg-white/20' : (isScrolled ? 'hover:bg-white/10' : 'hover:bg-black/20')
                   }`}>
                     <img 
                       src="/images/GOI logo.png" 
                       alt="Government of India Logo" 
-                      className="w-6 h-10 rounded"
+                      className="w-8 h-12 rounded"
                     />
                     <div>
                       <div className="font-medium">भारत सरकार</div>
@@ -139,26 +139,26 @@ export default function Navbar({ variant = "default" }) {
                     </div>
                   </a>
                   <div className={`w-px h-8 ${variant === "profile" ? 'bg-white/30' : (isScrolled ? 'bg-white/30' : 'bg-gray-600/60')}`}></div>
-                  <div className="flex items-center gap-3">
-                    <a href="https://www.coalindia.in/" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 px-2 py-1 rounded transition-colors ${
+                  <div className="flex items-center gap-4">
+                    <a href="https://igod.gov.in/organization/Q84zv3QBGZk0jujBKgGW" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-3 px-3 py-2 rounded transition-colors ${
                       variant === "profile" ? 'hover:bg-white/20' : (isScrolled ? 'hover:bg-white/10' : 'hover:bg-black/20')
                     }`}>
                       <img 
-                        src="/images/CoalLog4.png" 
-                        alt="Coal India Limited" 
-                        className="w-10 h-12 rounded bg-white object-cover"
+                        src="/images/igod3.png" 
+                        alt="Ministry of Development of North Eastern Region (MDONER)" 
+                        className="w-18 h-14 rounded bg-white"
                       />
-                      <span className="font-medium text-xs">Coal India Limited</span>
+                      <span className="font-medium text-sm">Integrated Government Online Directory (IGOD)</span>
                     </a>
-                    <a href="https://www.cmpdi.co.in/en" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-2 px-2 py-1 rounded transition-colors ${
+                    <a href="https://mdoner.gov.in/" target="_blank" rel="noopener noreferrer" className={`flex items-center gap-3 px-3 py-2 rounded transition-colors ${
                       variant === "profile" ? 'hover:bg-white/20' : (isScrolled ? 'hover:bg-white/10' : 'hover:bg-black/20')
                     }`}>
                       <img 
-                        src="/images/cmpdi logo.jpg" 
-                        alt="CMPDI" 
-                        className="w-20 h-12 rounded bg-white object-cover" 
+                        src="/images/logo 1.png" 
+                        alt="Ministry of Development of North Eastern Region (MDONER)" 
+                        className="w-24 h-14 rounded bg-white object-cover" 
                       />
-                      <span className="font-medium text-xs">CMPDI</span>
+                      <span className="font-medium text-sm">Ministry of Development of North Eastern Region (MDONER)</span>
                     </a>
                   </div>
                   <div className={`w-px h-8 mx-2 ${isScrolled ? 'bg-white/30' : 'bg-gray-600/60'}`}></div>
@@ -167,9 +167,9 @@ export default function Navbar({ variant = "default" }) {
             </Link>
           
             {/* Right Section: Font Controls, Language, and Navigation */}
-            <div className="hidden md:flex items-center gap-6">
+            <div className="hidden md:flex items-center gap-8">
               {/* Font Size Controls */}
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <button 
                   onClick={decreaseFontSize}
                   className={`w-6 h-6 rounded flex items-center justify-center transition-colors font-semibold ${
@@ -340,7 +340,7 @@ export default function Navbar({ variant = "default" }) {
                 // Guest navigation
                 <div className="flex items-center gap-4">
                   <Link href="/login">
-                    <button className={`group px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105 ${
+                    <button className={`group px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105 h-10 min-w-[140px] justify-center ${
                       isScrolled 
                         ? 'bg-gradient-to-r from-orange-700 to-orange-800 hover:from-orange-800 hover:to-orange-900 text-white shadow-lg' 
                         : 'bg-gray-900 hover:bg-gray-800 text-white shadow-lg'
@@ -352,7 +352,7 @@ export default function Navbar({ variant = "default" }) {
                     </button>
                   </Link>
                   <Link href="/register">
-                    <button className={`group border-2 px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105 ${
+                    <button className={`group border-2 px-6 py-2 rounded-lg font-medium transition-all duration-300 flex items-center gap-2 hover:scale-105 h-10 min-w-[140px] justify-center ${
                       isScrolled 
                         ? 'border-orange-700 hover:border-orange-800 text-orange-800 hover:bg-orange-700/10 bg-white/90' 
                         : 'border-gray-900 hover:border-gray-700 text-gray-900 hover:bg-gray-900/20 shadow-md'
